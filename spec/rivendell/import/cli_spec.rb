@@ -74,12 +74,15 @@ describe Rivendell::Import::CLI do
 
     context "in listen_mode" do
 
+      let(:directory) { "directory" }
+
       before(:each) do
         subject.stub :listen_mode? => true
+      subject.stub :paths => [directory]
       end
   
       it "should use listen import" do
-        subject.import.should_receive(:listen).with(subject.paths, {})
+        subject.import.should_receive(:listen).with(directory, {})
         subject.run
       end
 
