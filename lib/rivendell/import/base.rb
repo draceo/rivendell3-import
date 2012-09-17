@@ -53,7 +53,7 @@ module Rivendell::Import
     end
 
     def run_tasks
-      tasks.each(&:run)
+      tasks.pop(false).run until tasks.empty?
     end
 
   end

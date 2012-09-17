@@ -78,7 +78,7 @@ describe Rivendell::Import::CLI do
 
       before(:each) do
         subject.stub :listen_mode? => true
-      subject.stub :paths => [directory]
+        subject.stub :paths => [directory]
       end
   
       it "should use listen import" do
