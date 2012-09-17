@@ -4,31 +4,35 @@ module Rivendell::Import
     attr_accessor :number, :group
     attr_reader :task
 
-    def initialize(task)
+    def initialize(task = nil)
       @task = task
     end
 
-    def rdxport
-      task.rdxport
+    def xport
+      task.xport
     end
 
     def create
       unless number
-        self.number = rdxport.add_cart(:group => group).number
+        self.number = xport.add_cart(:group => group).number
       end
     end
 
     def update
-      # rdxport.edit_cart # to define title, etc ...
+      # xport.edit_cart # to define title, etc ...
     end
     
     def cut
       @cut ||= Cut.new(self)
     end
 
+    def destination
+      "group #{group}" if group
+    end
+
     def import(file)
       cut.create
-      rdxport.import number, cut.number, file.path
+      xport.import number, cut.number, file.path
       cut.update
     end
 

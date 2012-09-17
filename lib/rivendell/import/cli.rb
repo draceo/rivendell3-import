@@ -1,39 +1,78 @@
+require 'trollop'
+require 'logger'
+
 module Rivendell::Import
   class CLI
-    def run(arguments)
-      unless arguments.empty?
-        import = Rivendell::Import::Base.new
 
-        if arguments.first == "--config"
-          arguments.shift
-          load arguments.shift
-        end
+    attr_reader :arguments
+    attr_accessor :options_count
 
-        import.prepare_proc = Rivendell::Import.prepare_proc
+    def initialize(arguments = [])
+      @arguments = arguments
+    end
 
-        if arguments.first == "--listen"
-          listen_mode = true
-          arguments.shift
-        end
+    def config_file
+      @config_file ||= options[:config]
+    end
 
-        group = arguments.shift
+    def listen_mode?
+      options[:listen]
+    end
 
-        config = Proc.new do |file|
-          cart.group = group
-        end
+    def dry_run?
+      options[:dry_run]
+    end
 
-        path = arguments.shift
-        if ::File.directory?(path)
-          if listen_mode
-            import.listen(path, &config)
-          else
-            import.directory(path, &config)
-          end
-        else
-          import.file(path,&config)
-        end
+    def debug?
+      options[:debug]
+    end
 
-        import.tasks.each(&:run)
+    def parser
+      @parser ||= Trollop::Parser.new do
+        opt :config, "Configuration file", :type => String
+        opt :listen, "Wait for files in given directory"
+        opt :dry_run, "Just create tasks without executing them"
+        opt :debug, "Enable debug messages (in stderr)"
+      end
+    end
+
+    def options
+      @options ||= Trollop::with_standard_exception_handling(parser) do
+        raise Trollop::HelpNeeded if ARGV.empty? # show help screen
+        parser.parse arguments
+      end
+    end
+    alias_method :parse, :options
+
+    def parsed_parser
+      parse
+      parser
+    end
+
+    def import
+      @import ||= Rivendell::Import::Base.new
+    end
+
+    def paths
+      parsed_parser.leftovers
+    end
+
+    def run
+      Rivendell::Import.logger = Logger.new($stderr) if debug?
+
+      if config_file
+        load config_file 
+        import.to_prepare = Rivendell::Import.config.to_prepare
+      end
+
+      if listen_mode?
+        listen_options = {}
+        listen_options[:dry_run] = true if dry_run?
+
+        import.listen paths.first, listen_options
+      else
+        import.process paths
+        import.run_tasks unless dry_run?
       end
     end
   end

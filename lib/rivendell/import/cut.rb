@@ -9,17 +9,17 @@ module Rivendell::Import
       @cart = cart
     end
 
-    def rdxport
-      cart.rdxport
+    def xport
+      cart.xport
     end
 
     def create
-      # rdxport.delete_cuts # if clean cuts is required
-      self.number = rdxport.add_cut(cart.number).number unless number
+      # xport.delete_cuts # if clean cuts is required
+      self.number = xport.add_cut(cart.number).number unless number
     end
 
     def update
-      # rdxport.edit_cut # to define attributes
+      # xport.edit_cut # to define attributes
     end
 
   end

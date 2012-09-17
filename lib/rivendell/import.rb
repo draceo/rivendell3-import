@@ -1,17 +1,21 @@
 require "rivendell/import/version"
 
+require "null_logger"
+require "active_support/core_ext/module/attribute_accessors"
+
+require "rivendell/import/config"
+
 module Rivendell
   module Import
 
-    @@prepare_block = nil
-
-    def self.prepare(&block)
-      @@prepare_block = block
+    @@config = Config.new
+    def self.config(&block)
+      yield @@config if block_given?
+      @@config
     end
 
-    def self.prepare_proc
-      @@prepare_block
-    end
+    @@logger = NullLogger.instance
+    mattr_accessor :logger
 
   end
 end
@@ -19,6 +23,7 @@ end
 require 'listen'
 require "rivendell/api"
 
+require "rivendell/import/worker"
 require "rivendell/import/base"
 require "rivendell/import/cart"
 require "rivendell/import/context"

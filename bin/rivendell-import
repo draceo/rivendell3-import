@@ -3,4 +3,4 @@
 require "rivendell/import"
 require "rivendell/import/cli"
 
-Rivendell::Import::CLI.new.run(ARGV)
+Rivendell::Import::CLI.new(ARGV).run

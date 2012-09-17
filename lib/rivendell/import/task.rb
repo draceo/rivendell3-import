@@ -3,29 +3,37 @@ module Rivendell::Import
 
     attr_reader :file
 
-    def initialize(path)
-      @file = File.new(path)
+    def initialize(file = nil)
+      @file = file
     end
 
     def cart
       @cart ||= Cart.new(self)
     end
 
-    def rdxport
-      @rdxport ||= Rivendell::API::Xport.new
+    def xport
+      @xport ||= Rivendell::API::Xport.new
     end
 
-    def config(&block)
+    def prepare(&block)
       Context.new(self).run(&block)
       self
     end
 
+    def logger
+      Rivendell::Import.logger
+    end
+
+    def to_s
+      "Import '#{file}' in #{cart.destination}"
+    end
+
     def run
-      puts "Run Task #{self.inspect} with #{file.inspect}"
+      logger.info "Run Task #{self.inspect} with #{file.inspect}"
       cart.create
       cart.import file
       cart.update
-      puts "Created Cart #{cart.number}"
+      logger.info "Created Cart #{cart.number}"
     end
 
   end
