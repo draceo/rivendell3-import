@@ -26,10 +26,6 @@ module Rivendell::Import
       @cut ||= Cut.new(self)
     end
 
-    def destination
-      "group #{group}" if group
-    end
-
     def import(file)
       cut.create
       xport.import number, cut.number, file.path

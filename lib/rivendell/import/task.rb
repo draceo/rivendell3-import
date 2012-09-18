@@ -25,7 +25,11 @@ module Rivendell::Import
     end
 
     def to_s
-      "Import '#{file}' in #{cart.destination}"
+      "Import '#{file}' in #{destination}"
+    end
+
+    def destination
+      "Cart in group #{cart.group}" if cart.group
     end
 
     def run

@@ -2,6 +2,7 @@ require "rivendell/import/version"
 
 require "null_logger"
 require "active_support/core_ext/module/attribute_accessors"
+require "active_support/core_ext/module/delegation"
 
 require "rivendell/import/config"
 
@@ -24,9 +25,10 @@ require 'listen'
 require "rivendell/api"
 
 require "rivendell/import/worker"
+require "rivendell/import/task"
+require "rivendell/import/tasks"
 require "rivendell/import/base"
 require "rivendell/import/cart"
 require "rivendell/import/context"
 require "rivendell/import/cut"
 require "rivendell/import/file"
-require "rivendell/import/task"

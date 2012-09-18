@@ -16,9 +16,8 @@ describe Rivendell::Import::Worker do
   it "should run Import tasks in a separated Thread" do
     import.tasks << mock(:run => true)
     subject.start
-    sleep 1
-    import.tasks.should be_empty
+    sleep 0.5
+    import.tasks.should_not be_pending
   end
-  
 
 end

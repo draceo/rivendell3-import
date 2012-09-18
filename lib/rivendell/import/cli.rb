@@ -72,7 +72,7 @@ module Rivendell::Import
         import.listen paths.first, listen_options
       else
         import.process paths
-        import.run_tasks unless dry_run?
+        import.tasks.run unless dry_run?
       end
     end
   end

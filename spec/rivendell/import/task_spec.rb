@@ -48,7 +48,8 @@ describe Rivendell::Import::Task do
   describe "#run" do
 
     before(:each) do
-      subject.stub :cart => mock(:create => true, :import => true, :update => true, :number => 123, :destination => "dummy")
+      subject.stub :destination => "test"
+      subject.stub :cart => mock(:create => true, :import => true, :update => true, :number => 123)
     end
     
     it "should create Cart" do
@@ -68,5 +69,13 @@ describe Rivendell::Import::Task do
 
   end
 
+  describe "#destination" do
+    
+    it "should return 'Cart in group :group' if cart#group is defined" do
+      subject.cart.group = 'dummy'
+      subject.destination.should == "Cart in group dummy"
+    end
+
+  end
 
 end

@@ -6,7 +6,7 @@ module Rivendell::Import
     attr_reader :tasks, :workers
 
     def initialize
-      @tasks = Queue.new
+      @tasks = Tasks.new
       @workers = []
     end
 
@@ -31,8 +31,9 @@ module Rivendell::Import
       end
     end
 
-    def file(file, base_directory = nil)
-      create_task Rivendell::Import::File.new(file, :base_directory => base_directory)
+    def file(path, base_directory = nil)
+      file = Rivendell::Import::File.new(path, :base_directory => base_directory)
+      create_task file
     end
 
     def directory(directory)
@@ -43,17 +44,13 @@ module Rivendell::Import
 
     def create_task(file)
       Rivendell::Import.logger.debug "Create task for #{file}"
-      tasks << prepared_task(Rivendell::Import::Task.new(file))
+      tasks.create(file) do |task|
+        prepare_task task
+      end
     end
 
-    def prepared_task(task)
+    def prepare_task(task)
       task.prepare(&to_prepare) if to_prepare
-      Rivendell::Import.logger.debug task
-      task
-    end
-
-    def run_tasks
-      tasks.pop(false).run until tasks.empty?
     end
 
   end

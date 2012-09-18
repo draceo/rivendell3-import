@@ -75,15 +75,6 @@ describe Rivendell::Import::Cart do
 
   end
 
-  describe "#destination" do
-    
-    it "should return 'group :group' if group is defined" do
-      subject.group = 'dummy'
-      subject.destination.should == "group dummy"
-    end
-
-  end
-
   describe "#import" do
 
     let(:file) { mock :path => "dummy" }

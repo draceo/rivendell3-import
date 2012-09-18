@@ -62,7 +62,7 @@ describe Rivendell::Import::CLI do
 
     before(:each) do
       subject.stub :paths => %w{file1 file2}
-      subject.import.stub :run_tasks => true
+      subject.import.tasks.stub :run => true
     end
 
     it "should load config_file" do
@@ -111,7 +111,7 @@ describe Rivendell::Import::CLI do
       end
 
       it "should run tasks" do
-        subject.import.should_receive(:run_tasks)
+        subject.import.tasks.should_receive(:run)
         subject.run
       end
 
@@ -121,7 +121,7 @@ describe Rivendell::Import::CLI do
         end
 
         it "should not run tasks" do
-          subject.import.should_not_receive(:run_tasks)
+          subject.import.tasks.should_not_receive(:run)
           subject.run
         end
       end

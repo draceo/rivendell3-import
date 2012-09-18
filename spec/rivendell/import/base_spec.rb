@@ -2,25 +2,21 @@ require 'spec_helper'
 
 describe Rivendell::Import::Base do
 
-  describe "#prepared_task" do
+  describe "#prepare_task" do
 
     let(:task) { mock }
     
     it "should prepare task with to_prepare block" do
       subject.to_prepare = Proc.new {}
-      task.should_receive(:prepare)
-      subject.prepared_task(task)
-    end
-
-    it "should return task" do
-      subject.prepared_task(task).should == task
+      task.should_receive :prepare
+      subject.prepare_task task
     end
 
   end
 
   describe "#create_task" do
 
-    let(:file) { Rivendell::Import::File.new("dummy.wav") }
+    let(:file) { Rivendell::Import::File.new "dummy.wav" }
     let(:task) { Rivendell::Import::Task.new }
 
     before(:each) do
@@ -33,7 +29,7 @@ describe Rivendell::Import::Base do
     end
 
     it "should prepare task" do
-      subject.should_receive(:prepared_task).and_return(task)
+      subject.should_receive(:prepare_task).and_return(task)
       subject.create_task file
     end
 
@@ -44,18 +40,6 @@ describe Rivendell::Import::Base do
 
   end
 
-  describe "#run_tasks" do
-
-    let(:task) { Rivendell::Import::Task.new }
-
-    it "should run each task" do
-      subject.tasks << task
-      task.should_receive(:run)
-      subject.run_tasks
-    end
-
-  end
-  
   describe "#file" do
 
     let(:file) { Rivendell::Import::File.new("dummy.wav") }
