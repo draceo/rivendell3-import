@@ -76,6 +76,11 @@ describe Rivendell::Import::Task do
       subject.destination.should == "Cart in group dummy"
     end
 
+    it "should return 'Cart :number' if cart#number is defined" do
+      subject.cart.number = 123
+      subject.destination.should == "Cart 123"
+    end
+
   end
 
 end

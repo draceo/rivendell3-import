@@ -29,7 +29,11 @@ module Rivendell::Import
     end
 
     def destination
-      "Cart in group #{cart.group}" if cart.group
+      if cart.group
+        "Cart in group #{cart.group}" 
+      elsif cart.number
+        "Cart #{cart.number}" 
+      end
     end
 
     def run
