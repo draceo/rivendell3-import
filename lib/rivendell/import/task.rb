@@ -1,10 +1,11 @@
 module Rivendell::Import
   class Task
 
-    attr_reader :file
+    attr_reader :file, :tags
 
     def initialize(file = nil)
       @file = file
+      @tags = []
     end
 
     def cart
@@ -32,7 +33,7 @@ module Rivendell::Import
       if cart.group
         "Cart in group #{cart.group}" 
       elsif cart.number
-        "Cart #{cart.number}" 
+        "Cart #{cart.number}"
       end
     end
 
@@ -42,6 +43,10 @@ module Rivendell::Import
       cart.import file
       cart.update
       logger.info "Created Cart #{cart.number}"
+    end
+
+    def tag(tag)
+      self.tags << tag
     end
 
   end

@@ -15,3 +15,7 @@ end
 Then /^the task should have destination "([^"]*)"$/ do |destination|
   import.tasks.first.destination.should == destination
 end
+
+Then /^the task should have tag "([^"]*)"$/ do |tag|
+  import.tasks.first.tags.should include(tag)
+end

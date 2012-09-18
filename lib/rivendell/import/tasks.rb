@@ -31,6 +31,7 @@ module Rivendell::Import
     def create(file, &block)
       Rivendell::Import::Task.new(file).tap do |task|
         yield task
+        Rivendell::Import.logger.debug "Created task #{task.inspect}"
         push task
       end
     end

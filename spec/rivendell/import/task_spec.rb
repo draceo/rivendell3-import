@@ -83,4 +83,22 @@ describe Rivendell::Import::Task do
 
   end
 
+  describe "#tags" do
+    
+    it "should be empty by default" do
+      subject.tags.should be_empty
+    end
+
+  end
+
+  describe "#tag" do
+    
+    it "should add the given tag" do
+      subject.tag "dummy"
+      subject.tags.should == %w{dummy}
+    end
+    
+  end
+
+
 end

@@ -32,7 +32,7 @@ module Rivendell::Import
     end
 
     def file(path, base_directory = nil)
-      file = Rivendell::Import::File.new(path, :base_directory => base_directory)
+      file = Rivendell::Import::File.new path, :base_directory => base_directory
       create_task file
     end
 

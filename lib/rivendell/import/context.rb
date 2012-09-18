@@ -7,16 +7,15 @@ module Rivendell::Import
       @task = task
     end
 
-    def file
-      task.file
-    end
+    delegate :file, :cart, :logger, :to => :task
 
-    def cart
-      task.cart
+    def with(expression)
+      yield if file.match expression
     end
 
     def run(&block)
       instance_exec file, &block if block_given?
     end
+
   end
 end
