@@ -17,25 +17,15 @@ describe Rivendell::Import::Base do
   describe "#create_task" do
 
     let(:file) { Rivendell::Import::File.new "dummy.wav" }
-    let(:task) { Rivendell::Import::Task.new }
-
-    before(:each) do
-      Rivendell::Import::Task.stub :new => task
-    end
     
     it "should create a task with given file" do
-      Rivendell::Import::Task.should_receive(:new).with(file)
+      Rivendell::Import::Task.should_receive(:create).with({:file => file}, {})
       subject.create_task file
     end
 
     it "should prepare task" do
-      subject.should_receive(:prepare_task).and_return(task)
+      subject.should_receive(:prepare_task)
       subject.create_task file
-    end
-
-    it "should add task" do
-      subject.create_task file
-      subject.tasks.pop.should == task
     end
 
   end

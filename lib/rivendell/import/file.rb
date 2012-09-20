@@ -7,6 +7,9 @@ module Rivendell::Import
       if attributes[:base_directory]
         @path = name
         @name = self.class.relative_filename(name, attributes[:base_directory])
+      elsif attributes[:path]
+        @name = name
+        @path = attributes[:path]
       else
         @name = @path = name
       end
@@ -18,6 +21,10 @@ module Rivendell::Import
 
     def to_s
       name
+    end
+
+    def ==(other)
+      other and path == other.path
     end
 
     def match(expression)

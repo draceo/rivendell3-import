@@ -18,10 +18,19 @@ module Rivendell
     @@logger = NullLogger.instance
     mattr_accessor :logger
 
+    def self.establish_connection(file = "db.sqlite3")
+      ActiveRecord::Base.establish_connection :adapter => "sqlite3", :database => file
+      ActiveRecord::Migrator.migrate(::File.expand_path("../../../db/migrate/", __FILE__), nil)
+    end
+
   end
 end
 
 require 'listen'
+
+require 'active_record'
+ActiveRecord::Base.include_root_in_json = false
+
 require "rivendell/api"
 
 require "rivendell/import/worker"

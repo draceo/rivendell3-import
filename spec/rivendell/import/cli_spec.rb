@@ -58,6 +58,15 @@ describe Rivendell::Import::CLI do
 
   end
 
+  describe "#database" do
+    
+    it "should return file specified with --dabase" do
+      subject.arguments << "--database" << "tasks.sqlite3"
+      subject.database.should == "tasks.sqlite3"
+    end
+
+  end
+
   describe "#run" do
 
     before(:each) do
@@ -68,6 +77,13 @@ describe Rivendell::Import::CLI do
     it "should load config_file" do
       subject.stub :config_file => "dummy.rb"
       subject.should_receive(:load).with(subject.config_file)
+
+      subject.run
+    end
+
+    it "should establish_connection with specified database" do
+      subject.stub :database => "tasks.sqlite3"
+      Rivendell::Import.should_receive(:establish_connection).with("tasks.sqlite3")
 
       subject.run
     end

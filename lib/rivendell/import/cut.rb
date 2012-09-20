@@ -1,12 +1,19 @@
 module Rivendell::Import
   class Cut
 
+    include ActiveModel::Serialization
+    include ActiveModel::Serializers::JSON
+
     attr_reader :cart
 
     attr_accessor :number
 
     def initialize(cart)
       @cart = cart
+    end
+
+    def attributes
+      {}
     end
 
     def xport

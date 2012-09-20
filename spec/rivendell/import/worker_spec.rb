@@ -5,6 +5,8 @@ describe Rivendell::Import::Worker do
   let(:import) { Rivendell::Import::Base.new }
   subject { Rivendell::Import::Worker.new import }
 
+  let(:file) { Rivendell::Import::File.new "dummy.wav" }
+
   describe "initialization" do
 
     it "should use the given Import" do
@@ -14,7 +16,7 @@ describe Rivendell::Import::Worker do
   end
 
   it "should run Import tasks in a separated Thread" do
-    import.tasks << mock(:run => true)
+    import.tasks.create file
     subject.start
     sleep 0.5
     import.tasks.should_not be_pending

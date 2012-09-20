@@ -1,38 +1,21 @@
 module Rivendell::Import
   class Tasks
 
-    include Enumerable
-
-    def initialize()
-      @all = []
-      @queue = Queue.new
-    end
-
-    def push(task)
-      all << task
-      queue << task
-    end
-    alias_method :<<, :push
-
     def pending?
-      not queue.empty?
+      not Task.pending.empty?
     end
 
-    delegate :pop, :to => :queue
-    delegate :each, :to => :all
-
-    attr_reader :all, :queue
-    private :all, :queue
+    def pop
+      Task.pending.first
+    end
 
     def run
-      each(&:run)
+      Task.pending.find_each(&:run)
     end
 
     def create(file, &block)
-      Rivendell::Import::Task.new(file).tap do |task|
-        yield task
+      Rivendell::Import::Task.create({:file => file}, {}, &block).tap do |task|
         Rivendell::Import.logger.debug "Created task #{task.inspect}"
-        push task
       end
     end
 

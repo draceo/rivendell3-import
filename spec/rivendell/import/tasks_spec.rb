@@ -2,26 +2,12 @@ require 'spec_helper'
 
 describe Rivendell::Import::Tasks do
 
-  let(:task) { mock }
-
-  describe "#push" do
-    
-    it "should add task to queue" do
-      subject.push task
-      subject.pop.should == task
-    end
-
-    it "should add task to list" do
-      subject.push task
-      subject.to_a.should == [ task ]
-    end
-
-  end
+  let(:file) { Rivendell::Import::File.new "dummy.wav" }
 
   describe "#pending?" do
     
-    it "should be true when queue is not empty?" do
-      subject.push task
+    it "should be true when a task is pending" do
+      subject.create file
       subject.should be_pending
     end
 
@@ -34,10 +20,9 @@ describe Rivendell::Import::Tasks do
   describe "#run" do
     
     it "should run each task" do
-      task.should_receive(:run)
-      subject.push task
-      
-      subject.run
+      task = subject.create(file)
+      subject.run rescue nil
+      task.reload.status.should_not be_pending
     end
 
   end

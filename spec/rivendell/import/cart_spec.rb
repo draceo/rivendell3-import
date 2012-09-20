@@ -39,6 +39,7 @@ describe Rivendell::Import::Cart do
 
     it "should use the number returned by Xport#add_cart" do
       subject.xport.stub(:add_cart).and_return(mock(:number => 123))
+      subject.group = "dummy"
       subject.create
       subject.number.should == 123
     end
@@ -60,7 +61,8 @@ describe Rivendell::Import::Cart do
     context "when group isn't defined" do
 
       it "should raise an error" do
-        pending
+        subject.group = nil
+        lambda { subject.create }.should raise_error
       end
                                          
     end

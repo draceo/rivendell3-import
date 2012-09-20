@@ -19,6 +19,9 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'httmultiparty'
   gem.add_runtime_dependency 'rivendell-api'
   gem.add_runtime_dependency 'trollop'
+  gem.add_runtime_dependency 'activerecord', '~> 3.2.8'
+  gem.add_runtime_dependency 'activesupport', '~> 3.2.8'
+  gem.add_runtime_dependency 'sqlite3'
 
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rspec"
@@ -27,4 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "guard-cucumber"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "cucumber"
+  gem.add_development_dependency "database_cleaner"
+  # gem.add_development_dependency "remarkable_activerecord"
+
 end

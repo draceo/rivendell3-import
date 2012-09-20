@@ -19,8 +19,15 @@ module Rivendell::Import
     def run
       loop do
         task = import.tasks.pop
-        task.run
+        if task
+          task.run
+        else
+          Rivendell::Import.logger.debug "No pending task, sleep 10s"
+          sleep 10
+        end
       end
+    rescue => e
+      Rivendell::Import.logger.error "Worker failed : #{e}"
     end
 
   end

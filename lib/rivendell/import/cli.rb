@@ -27,12 +27,17 @@ module Rivendell::Import
       options[:debug]
     end
 
+    def database
+      options[:database]
+    end
+
     def parser
       @parser ||= Trollop::Parser.new do
         opt :config, "Configuration file", :type => String
         opt :listen, "Wait for files in given directory"
         opt :dry_run, "Just create tasks without executing them"
         opt :debug, "Enable debug messages (in stderr)"
+        opt :database, "The database file used to store tasks", :type => String
       end
     end
 
@@ -59,6 +64,10 @@ module Rivendell::Import
 
     def run
       Rivendell::Import.logger = Logger.new($stderr) if debug?
+
+      if database
+        Rivendell::Import.establish_connection database
+      end
 
       if config_file
         load config_file 
