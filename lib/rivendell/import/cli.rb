@@ -67,6 +67,8 @@ module Rivendell::Import
 
       if database
         Rivendell::Import.establish_connection database
+      else
+        Rivendell::Import.establish_connection
       end
 
       if config_file

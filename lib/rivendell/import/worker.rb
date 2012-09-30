@@ -22,7 +22,7 @@ module Rivendell::Import
         if task
           task.run
         else
-          Rivendell::Import.logger.debug "No pending task, sleep 10s"
+          # Rivendell::Import.logger.debug "No pending task, sleep 10s"
           sleep 10
         end
       end

@@ -79,7 +79,7 @@ describe Rivendell::Import::Cart do
 
   describe "#import" do
 
-    let(:file) { mock :path => "dummy" }
+    let(:file) { mock :path => "dummy", :exists? => true }
 
     before(:each) do
       subject.number = 123

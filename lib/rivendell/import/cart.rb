@@ -45,6 +45,8 @@ module Rivendell::Import
     end
 
     def import(file)
+      raise "File #{file.path} not found" unless file.exists?
+
       cut.create
       xport.import number, cut.number, file.path
       cut.update

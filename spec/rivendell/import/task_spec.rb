@@ -74,7 +74,7 @@ describe Rivendell::Import::Task do
 
     it "should change the status to failed if an error is raised" do
       subject.cart.stub(:create).and_raise("dummy")
-      lambda { subject.run }.should raise_error
+      subject.run
       subject.status.should be_failed
     end
 
@@ -142,6 +142,74 @@ describe Rivendell::Import::Task do
 
     it "should be pending by default" do
       subject.status.should be_pending
+    end
+
+  end
+
+  describe "#notifications" do
+    
+    before(:each) do
+      subject.save!
+    end
+
+    it "should be empty by default" do
+      subject.notifications.should be_empty
+    end
+
+  end
+
+  describe "#notifiers" do
+
+    before(:each) do
+      subject.save!
+    end
+
+    let(:notifier) { Rivendell::Import::Notifier::Test.create! }
+    
+    it "should create a Notification when a Notifier is added" do
+      subject.notifiers << notifier
+      subject.notifications.first.notifier.should == notifier
+    end
+
+  end
+
+  describe "#notify!" do
+    
+    before(:each) do
+      subject.status = "completed"
+      subject.save!
+      subject.notifiers << notifier
+    end
+
+    let(:notifier) { Rivendell::Import::Notifier::Test.create! }
+    
+    it "should notify task with all associated notifiers" do
+      subject.notify!
+      notifier.notified_tasks.should == [ subject ]
+    end
+
+    it "should mark notification as sent" do
+      subject.notify!
+      subject.notifications.first.should be_sent
+    end
+
+  end
+
+  describe "#change_status!" do
+    
+    it "should update_attribute :status" do
+      subject.should_receive(:update_attribute).with(:status, "completed")
+      subject.change_status! :completed
+    end
+
+    it "should notify change when status is completed" do
+      subject.should_receive(:notify!)
+      subject.change_status! :completed
+    end
+
+    it "should notify change when status is failed" do
+      subject.should_receive(:notify!)
+      subject.change_status! :failed
     end
 
   end

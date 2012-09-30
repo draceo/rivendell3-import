@@ -35,5 +35,9 @@ module Rivendell::Import
       end
     end
 
+    def exists?
+      ::File.exists? path
+    end
+
   end
 end

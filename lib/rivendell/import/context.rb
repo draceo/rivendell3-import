@@ -13,6 +13,13 @@ module Rivendell::Import
       yield if file.match expression
     end
 
+    def notify(target, options = {})
+      Rivendell::Import::Notifier::Base.notify(target, options).tap do |notifier|
+        logger.debug "Will notify with #{notifier.inspect}"
+        task.notifiers << notifier
+      end
+    end
+
     def run(&block)
       instance_exec file, &block if block_given?
     end
