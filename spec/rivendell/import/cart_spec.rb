@@ -44,7 +44,7 @@ describe Rivendell::Import::Cart do
       subject.number.should == 123
     end
 
-    context "when number is already definied" do
+    context "when number is already defined" do
 
       before(:each) do
         subject.number = 666
@@ -55,7 +55,7 @@ describe Rivendell::Import::Cart do
         subject.create
         subject.number.should == 666
       end
-                                                
+
     end
 
     context "when group isn't defined" do
