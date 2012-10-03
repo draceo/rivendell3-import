@@ -16,7 +16,15 @@ Rivendell::Import::Notifier::Mail.from = "root@tryphon.eu"
 
 Rivendell::Import.config do |config|
   config.to_prepare do |file|
-    cart.group = "TEST"
+    file.in("music") do
+      cart.group = "MUSIC"
+    end
+
+    file.in("pad") do
+      cart.find_by_title file.basename
+    end
+    
+    cart.group ||= "TEST"
 
     notify 'alban@tryphon.eu', :by => :email
   end

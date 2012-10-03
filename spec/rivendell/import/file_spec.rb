@@ -42,4 +42,22 @@ describe Rivendell::Import::File do
 
   end
 
+  describe "#basename" do
+    
+    it "should return 'dummy' for 'path/to/dummy.wav'" do
+      subject.stub :name => "path/to/dummy.wav"
+      subject.basename.should == "dummy"
+    end
+
+  end
+
+  describe "#extension" do
+    
+    it "should 'wav' for 'path/to/dummy.wav'" do
+      subject.stub :name => "path/to/dummy.wav"
+      subject.extension.should == "wav"
+    end
+
+  end
+
 end

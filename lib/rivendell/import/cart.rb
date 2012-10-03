@@ -52,6 +52,16 @@ module Rivendell::Import
       cut.update
     end
 
+    def find_by_title(string, options = {})
+      if remote_cart = carts_cache.find_by_title(string, options)
+        self.number = remote_cart.number
+      end
+    end
+
+    def carts_cache
+      @carts_cache ||= Rivendell::Import::CartsCache.new(xport)
+    end
+
   end
 end
   

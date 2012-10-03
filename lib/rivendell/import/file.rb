@@ -23,6 +23,14 @@ module Rivendell::Import
       name
     end
 
+    def basename
+      ::File.basename(name, ".#{extension}")
+    end
+
+    def extension
+      ::File.extname(name).gsub(/^\./,'')
+    end
+
     def ==(other)
       other and path == other.path
     end
@@ -32,6 +40,12 @@ module Rivendell::Import
         verb = result ? "match" : "doesn't match"
         Rivendell::Import.logger.debug "File #{verb} '#{expression}'"
         !!result
+      end
+    end
+
+    def in(directory, &block)
+      if match %r{^#{directory}/}
+        yield 
       end
     end
 

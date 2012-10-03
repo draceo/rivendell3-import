@@ -104,4 +104,29 @@ describe Rivendell::Import::Cart do
 
   end
 
+  describe "#find_by_title" do
+
+    let(:cart) { mock :title => "The Title of the Cart", :number => 123 }
+
+    before(:each) do
+      subject.stub_chain("xport.list_carts").and_return([cart])
+    end
+
+    it "should find an exact title" do
+      subject.find_by_title(cart.title)
+      subject.number.should == cart.number
+    end
+
+    it "should find with a 'matching' filename ('the-title_of_the Cart' for 'The Title of the Cart')" do
+      subject.find_by_title("the-title_of_the Cart")
+      subject.number.should == cart.number
+    end
+
+    it "should use specified options to find carts" do
+      subject.xport.should_receive(:list_carts).with(:group => "TEST").and_return([cart])
+      subject.find_by_title("dummy", :group => "TEST")
+    end
+
+  end
+
 end

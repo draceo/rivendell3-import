@@ -29,7 +29,11 @@ module Rivendell::Import
     end
 
     def prepare(&block)
-      Context.new(self).run(&block)
+      begin
+        Context.new(self).run(&block)
+      rescue => e
+        logger.error "Task preparation failed : #{e}"
+      end
       self
     end
 
@@ -63,9 +67,9 @@ module Rivendell::Import
       save!
       change_status! :completed
 
-      logger.info "Created Cart #{cart.number}"
+      logger.info "Imported Cart #{cart.number}"
     rescue Exception => e
-      Rivendell::Import.logger.error "Task failed : #{e}"
+      logger.error "Task failed : #{e}"
     ensure
       unless status.completed?
         change_status! :failed 
