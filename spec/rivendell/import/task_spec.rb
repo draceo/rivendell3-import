@@ -214,4 +214,37 @@ describe Rivendell::Import::Task do
 
   end
 
+  describe "#delete_file!" do
+    
+    it "should set flag delete_file" do
+      subject.delete_file!
+      subject.delete_file.should be_true
+    end
+
+    context "defined" do
+
+      before do
+        subject.stub :cart => mock.as_null_object
+      end
+      
+
+      it "should destroy! file when task is completed" do
+        subject.delete_file!
+        subject.file.should_receive(:destroy!)
+        subject.run
+      end
+                  
+    end
+
+    context "not defined" do
+
+      it "should destroy! file when task is completed" do
+        subject.file.should_not_receive(:destroy!)
+        subject.run
+      end
+                  
+    end
+
+  end
+
 end

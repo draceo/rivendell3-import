@@ -1,5 +1,6 @@
 module Rivendell::Import::Tasking
   module File
+
     def file=(file)
       if file
         @file = file
@@ -16,5 +17,10 @@ module Rivendell::Import::Tasking
     def file
       @file ||= Rivendell::Import::File.new(file_name, :path => file_path)
     end
+
+    def delete_file!
+      self.delete_file = true
+    end
+
   end
 end

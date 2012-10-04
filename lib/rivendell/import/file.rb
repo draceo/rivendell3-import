@@ -53,5 +53,10 @@ module Rivendell::Import
       ::File.exists? path
     end
 
+    def destroy!
+      Rivendell::Import.logger.debug "Delete file #{path}"
+      ::File.delete(path) if exists?
+    end
+
   end
 end

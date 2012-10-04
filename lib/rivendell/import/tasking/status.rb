@@ -9,6 +9,7 @@ module Rivendell::Import::Tasking
       base.class_eval do
         after_initialize :define_default_status
       end
+      base.extend ClassMethods
     end
 
     def raw_status
@@ -22,7 +23,27 @@ module Rivendell::Import::Tasking
     def change_status!(status)
       logger.debug "Change status to #{status}"
       update_attribute :status, status.to_s
-      notify! if ran?
+      # notify! if ran?
+      invoke_status_changed_callbacks
+    end
+
+    def invoke_status_changed_callbacks
+      callbacks = self.class.status_changed_callbacks.values_at(:all, status.to_sym).flatten
+      callbacks.each { |method| send method }
+    end
+
+    module ClassMethods
+
+      def status_changed_callbacks
+        @status_changed_callbacks ||= Hash.new { |h,k| h[k] = [] }
+      end
+
+      def after_status_changed(method, options = {})
+        Array(options[:on] || :all).each do |status|
+          status_changed_callbacks[status] << method
+        end
+      end
+
     end
 
   end

@@ -53,6 +53,11 @@ module Rivendell::Import
         notifier.notify
       end
     end
+    after_status_changed :notify!, :on => [:completed, :failed]
+
+    def destroy_file!
+      file.destroy! if delete_file?
+    end
 
     def run
       logger.debug "Run #{self.inspect}"
@@ -64,7 +69,7 @@ module Rivendell::Import
       cart.import file
       cart.update
 
-      save!
+      destroy_file!
       change_status! :completed
 
       logger.info "Imported Cart #{cart.number}"
@@ -74,6 +79,7 @@ module Rivendell::Import
       unless status.completed?
         change_status! :failed 
       end
+      save!
     end
 
   end
