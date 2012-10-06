@@ -169,7 +169,7 @@ describe Rivendell::Import::CLI do
       end
 
       it "should use a SyslogLogger" do
-        Rivendell::Import.should_receive(:logger=).with(kind_of(SyslogLogger))
+        Rivendell::Import.should_receive(:logger=).with(kind_of(Syslog::Logger))
         subject.setup_logger
       end
 

@@ -1,6 +1,6 @@
 require 'trollop'
 require 'logger'
-require 'syslog_logger'
+require 'syslog/logger'
 
 module Rivendell::Import
   class CLI
@@ -71,7 +71,7 @@ module Rivendell::Import
     def setup_logger 
       new_logger =
         if syslog?
-          SyslogLogger.new('rivendell-import').tap do |syslog|
+          Syslog::Logger.new('rivendell-import').tap do |syslog|
             syslog.level = debug? ? Logger::DEBUG : Logger::INFO
           end
         elsif debug?
@@ -91,7 +91,7 @@ module Rivendell::Import
       end
 
       if config_file
-        load config_file 
+        load config_file
         import.to_prepare = Rivendell::Import.config.to_prepare
       end
 

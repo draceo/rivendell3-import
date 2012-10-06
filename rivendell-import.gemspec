@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'activesupport', '~> 3.2.8'
   gem.add_runtime_dependency 'mail'
   gem.add_runtime_dependency 'sqlite3'
-  gem.add_runtime_dependency 'SyslogLogger'
+  gem.add_runtime_dependency 'SyslogLogger', '~> 2.0'
 
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rspec"
