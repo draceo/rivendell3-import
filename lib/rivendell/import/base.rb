@@ -10,7 +10,13 @@ module Rivendell::Import
       @workers = []
     end
 
+    @@default_to_prepare = nil
+    cattr_accessor :default_to_prepare
+
     attr_accessor :to_prepare
+    def to_prepare
+      @to_prepare or default_to_prepare
+    end
 
     def listen(directory, options = {})
       workers << Worker.new(self).start unless options[:dry_run]

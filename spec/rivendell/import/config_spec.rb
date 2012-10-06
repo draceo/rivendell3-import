@@ -8,9 +8,9 @@ describe Rivendell::Import::Config do
 
     let(:user_block) { Proc.new {} }
     
-    it "should define to_prepare proc with given block" do
+    it "should define Base.default_to_prepare with given block" do
       subject.to_prepare(&user_block)
-      subject.to_prepare.should == user_block
+      Rivendell::Import::Base.default_to_prepare.should == user_block
     end
 
   end

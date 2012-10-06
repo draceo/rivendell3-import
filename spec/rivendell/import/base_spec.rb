@@ -14,6 +14,17 @@ describe Rivendell::Import::Base do
 
   end
 
+  describe "#to_prepare" do
+
+    let(:block) { mock }
+
+    it "should use default_to_prepare if not defined" do
+      subject.stub :default_to_prepare => block
+      subject.to_prepare.should == block
+    end
+                           
+  end
+
   describe "#create_task" do
 
     let(:file) { Rivendell::Import::File.new "dummy.wav" }

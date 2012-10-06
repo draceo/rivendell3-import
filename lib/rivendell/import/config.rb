@@ -2,11 +2,7 @@ module Rivendell::Import
   class Config
 
     def to_prepare(&block)
-      if block_given?
-        @prepare = block
-      else
-        @prepare
-      end
+      Base.default_to_prepare = block
     end
 
     def rivendell
