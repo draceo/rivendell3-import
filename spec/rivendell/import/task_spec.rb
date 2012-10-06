@@ -139,16 +139,29 @@ describe Rivendell::Import::Task do
       subject.destination.should == Rivendell::Import::Task.find(subject).destination
     end
 
+    def reloaded_task
+      subject.save
+      Rivendell::Import::Task.find(subject)
+    end
+
     it "should store tags separated with commas" do
       subject.tags << "tag1" << "tag2"
-      subject.save
-      Rivendell::Import::Task.find(subject).raw_tags.should == "tag1,tag2"
+      reloaded_task.raw_tags.should == "tag1,tag2"
     end
 
     it "should store cart" do
       subject.cart.number = 123
-      subject.save
-      Rivendell::Import::Task.find(subject).cart.number.should == 123
+      reloaded_task.cart.number.should == 123
+    end
+
+    it "should store cart" do
+      subject.cart.number = 123
+      reloaded_task.cart.number.should == 123
+    end
+
+    it "should store cart" do
+      subject.xport_options[:host] = "dummy"
+      reloaded_task.xport_options[:host].should == "dummy"
     end
     
   end
