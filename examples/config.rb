@@ -21,10 +21,14 @@ Rivendell::Import.config do |config|
     end
 
     file.in("pad") do
+      cart.clear_cuts!
       cart.find_by_title file.basename
     end
     
     cart.group ||= "TEST"
+
+    # To delete file when task is completed
+    #task.delete_file!
 
     notify 'alban@tryphon.eu', :by => :email
   end

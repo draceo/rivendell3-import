@@ -5,7 +5,7 @@ module Rivendell::Import
     include ActiveModel::Serializers::JSON
 
     def attributes
-      %w{number group}.inject({}) do |map, attribute|
+      %w{number group clear_cuts?}.inject({}) do |map, attribute|
         value = send attribute
         map[attribute] = value if value
         map
@@ -48,6 +48,7 @@ module Rivendell::Import
       raise "File #{file.path} not found" unless file.exists?
 
       cut.create
+      xport.clear_cuts number if clear_cuts?
       xport.import number, cut.number, file.path
       cut.update
     end
@@ -56,6 +57,13 @@ module Rivendell::Import
       if remote_cart = carts_cache.find_by_title(string, options)
         self.number = remote_cart.number
       end
+    end
+
+    attr_accessor :clear_cuts
+    alias_method :clear_cuts?, :clear_cuts
+
+    def clear_cuts!
+      self.clear_cuts = true
     end
 
     def carts_cache

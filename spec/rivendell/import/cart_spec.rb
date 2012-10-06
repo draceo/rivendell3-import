@@ -83,8 +83,7 @@ describe Rivendell::Import::Cart do
 
     before(:each) do
       subject.number = 123
-      subject.stub :xport => mock(:import => true)
-      subject.cut.stub :create => true, :number => 1, :update => true
+      subject.stub :cut => mock.as_null_object, :xport => mock.as_null_object
     end
     
     it "should create Cut" do
@@ -100,6 +99,25 @@ describe Rivendell::Import::Cart do
     it "should update Cut" do
       subject.cut.should_receive :update
       subject.import file
+    end
+
+    context "clear_cuts has been defined" do
+      before do
+        subject.clear_cuts!
+      end
+
+      it "should invoke Xport#clear_cuts before create a new cut" do
+        subject.xport.should_receive(:clear_cuts).ordered.with(subject.number)
+        subject.xport.should_receive(:import).ordered
+        subject.import file
+      end
+    end
+
+    context "clear_cuts hasn't been defined" do
+      it "should not invoke Xport#clear_cuts" do
+        subject.xport.should_not_receive(:create_cuts).with(subject.number)
+        subject.import file
+      end
     end
 
   end
@@ -125,6 +143,19 @@ describe Rivendell::Import::Cart do
     it "should use specified options to find carts" do
       subject.xport.should_receive(:list_carts).with(:group => "TEST").and_return([cart])
       subject.find_by_title("dummy", :group => "TEST")
+    end
+
+  end
+
+  describe "#clear_cuts!" do
+
+    before do
+      subject.number = 123
+    end
+    
+    it "should set flag clear_cuts" do
+      subject.clear_cuts!
+      subject.clear_cuts.should be_true
     end
 
   end
