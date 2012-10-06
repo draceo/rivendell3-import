@@ -15,6 +15,11 @@ end
 Rivendell::Import::Notifier::Mail.from = "root@tryphon.eu"
 
 Rivendell::Import.config do |config|
+
+  config.rivendell.host = "localhost"
+  config.rivendell.login_name = "user"
+  config.rivendell.password = ""
+
   config.to_prepare do |file|
     file.in("music") do
       cart.group = "MUSIC"

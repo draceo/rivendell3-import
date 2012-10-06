@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Rivendell::Import::Config do
+ 
+  let(:config) { Rivendell::Import::Config.new }
 
   describe "#to_prepare" do
 
@@ -11,6 +13,26 @@ describe Rivendell::Import::Config do
       subject.to_prepare.should == user_block
     end
 
+  end
+
+  describe "#rivendell" do
+
+    subject { config.rivendell }
+
+    def self.it_should_define_task_default_xport_option(attribute)
+      describe "#{attribute}=" do
+        attribute = attribute.to_sym
+        it "should define Task.default_xport_options[:#{attribute}]" do
+          subject.send "#{attribute}=", "dummy"
+          Rivendell::Import::Task.default_xport_options[attribute].should == "dummy"
+        end
+      end
+    end
+
+    it_should_define_task_default_xport_option :host
+    it_should_define_task_default_xport_option :login_name
+    it_should_define_task_default_xport_option :password
+    
   end
 
 end

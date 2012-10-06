@@ -27,6 +27,26 @@ describe Rivendell::Import::Task do
       subject.xport.should be_instance_of(Rivendell::API::Xport)
     end
 
+    it "should use xport_options" do
+      subject.xport_options[:host] = "dummy"
+      subject.xport.host.should == "dummy"
+    end
+
+  end
+
+  describe "#xport_options" do
+    
+    it "should use #default_xport_options" do
+      subject.stub :default_xport_options => { :host => "dummy" }  
+      subject.xport_options.should == { :host => "dummy" }
+    end
+
+    it "should not modified #default_xport_options" do
+      subject.stub :default_xport_options => { :host => "dummy" }  
+      subject.xport_options[:host] = "other"
+      subject.default_xport_options.should == { :host => "dummy" }
+    end
+
   end
 
   describe "#prepare" do

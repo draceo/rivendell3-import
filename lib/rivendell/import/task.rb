@@ -24,8 +24,15 @@ module Rivendell::Import
       status.completed? or status.failed?
     end
 
+    @@default_xport_options = {}
+    cattr_accessor :default_xport_options
+
+    def xport_options
+      @xport_options ||= default_xport_options.dup
+    end
+
     def xport
-      @xport ||= Rivendell::API::Xport.new
+      @xport ||= Rivendell::API::Xport.new(xport_options)
     end
 
     def prepare(&block)
