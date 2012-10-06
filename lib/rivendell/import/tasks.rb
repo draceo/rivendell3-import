@@ -1,10 +1,6 @@
 module Rivendell::Import
   class Tasks
 
-    def pending?
-      not Task.pending.empty?
-    end
-
     def pop
       Task.pending.first
     end
