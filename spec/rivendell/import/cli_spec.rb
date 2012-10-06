@@ -40,6 +40,15 @@ describe Rivendell::Import::CLI do
 
   end
 
+  describe "syslog?" do
+    
+    it "should return true when --syslog is specified" do
+      subject.arguments << "--syslog"
+      subject.should be_syslog
+    end
+
+  end
+
   describe "#import" do
 
     it "should return a Rivendell::Import::Base instance" do
@@ -72,6 +81,11 @@ describe Rivendell::Import::CLI do
     before(:each) do
       subject.stub :paths => %w{file1 file2}
       subject.import.tasks.stub :run => true
+    end
+
+    it "should setup logger" do
+      subject.should_receive(:setup_logger)
+      subject.run
     end
 
     it "should load config_file" do
@@ -144,6 +158,23 @@ describe Rivendell::Import::CLI do
 
     end
     
+  end
+
+  describe "#setup_logger" do
+    
+    context " with syslog option" do
+
+      before do
+        subject.stub :syslog? => true
+      end
+
+      it "should use a SyslogLogger" do
+        Rivendell::Import.should_receive(:logger=).with(kind_of(SyslogLogger))
+        subject.setup_logger
+      end
+
+    end
+
   end
 
 end

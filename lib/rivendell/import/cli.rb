@@ -1,5 +1,6 @@
 require 'trollop'
 require 'logger'
+require 'syslog_logger'
 
 module Rivendell::Import
   class CLI
@@ -27,6 +28,10 @@ module Rivendell::Import
       options[:debug]
     end
 
+    def syslog?
+      options[:syslog]
+    end
+
     def database
       options[:database]
     end
@@ -37,6 +42,7 @@ module Rivendell::Import
         opt :listen, "Wait for files in given directory"
         opt :dry_run, "Just create tasks without executing them"
         opt :debug, "Enable debug messages (in stderr)"
+        opt :syslog, "Log messages to syslog"
         opt :database, "The database file used to store tasks", :type => String
       end
     end
@@ -62,8 +68,21 @@ module Rivendell::Import
       parsed_parser.leftovers
     end
 
+    def setup_logger 
+      new_logger =
+        if syslog?
+          SyslogLogger.new('rivendell-import').tap do |syslog|
+            syslog.level = debug? ? Logger::DEBUG : Logger::INFO
+          end
+        elsif debug?
+          Logger.new($stderr)
+        end
+
+      Rivendell::Import.logger = new_logger if new_logger
+    end
+      
     def run
-      Rivendell::Import.logger = Logger.new($stderr) if debug?
+      setup_logger
 
       if database
         Rivendell::Import.establish_connection database
