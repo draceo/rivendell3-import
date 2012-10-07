@@ -58,10 +58,15 @@ module Rivendell::Import::Notifier
 
     after_initialize :read_parameters
 
+    def parameters_hash
+      parameters_as_string = parameters.sort_by { |p| p.first.to_s }.flatten.join('-')
+      Digest::SHA256.hexdigest parameters_as_string
+    end
+
     def write_parameters
       if parameters.present?
         write_attribute :parameters, parameters.to_json
-        write_attribute :key, parameters.hash
+        write_attribute :key, parameters_hash
       else
         write_attribute :parameters, nil
         write_attribute :key, nil
@@ -76,7 +81,7 @@ module Rivendell::Import::Notifier
                        Mail.new options.merge(:to => target)
                      end
 
-      key = new_notifier.parameters.hash
+      key = new_notifier.parameters_hash
       if existing_notifier = where(:type => new_notifier.type, :key => key).first
         existing_notifier
       else

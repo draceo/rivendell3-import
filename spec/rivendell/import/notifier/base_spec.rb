@@ -55,9 +55,23 @@ describe Rivendell::Import::Notifier::Base do
       subject.key = nil
       subject.stub :parameters => { :dummy => true }
       subject.save!
-      subject.key.should == subject.parameters.hash
+      subject.key.should == subject.parameters_hash
     end
 
+  end
+
+  describe "#parameters_hash" do
+
+    let(:other) { Rivendell::Import::Notifier::Test.new }
+
+    it "should be identical when parameters are identical" do
+      subject.stub :parameters => { :first => 1, :second => 2  }
+      other.stub :parameters => { :second => 2, :first => 1 }
+
+      subject.parameters_hash.should == other.parameters_hash
+    end
+    
+    
   end
 
 end
