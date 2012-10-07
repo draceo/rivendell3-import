@@ -91,6 +91,7 @@ module Rivendell::Import
       logger.info "Imported Cart #{cart.number}"
     rescue Exception => e
       logger.error "Task failed : #{e}"
+      logger.debug e.backtrace.join("\n")
     ensure
       unless status.completed?
         change_status! :failed 
