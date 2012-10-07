@@ -80,6 +80,16 @@ module Rivendell::Import
 
       Rivendell::Import.logger = new_logger if new_logger
     end
+
+    def start_webserver
+      require 'rivendell/import/application'
+
+      Rivendell::Import.logger.debug "Start webserver"
+
+      Thread.new do
+        Rivendell::Import::Application.run!
+      end
+    end
       
     def run
       setup_logger
@@ -92,8 +102,9 @@ module Rivendell::Import
 
       if config_file
         load config_file
-        import.to_prepare = Rivendell::Import.config.to_prepare
       end
+
+      start_webserver
 
       if listen_mode?
         listen_options = {}

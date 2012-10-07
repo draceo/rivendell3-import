@@ -80,6 +80,7 @@ describe Rivendell::Import::CLI do
 
     before(:each) do
       subject.stub :paths => %w{file1 file2}
+      subject.stub :start_webserver
       subject.import.tasks.stub :run => true
     end
 
