@@ -110,9 +110,9 @@ module Rivendell::Import
 
       config_loader.load
 
-      start_webserver
-
       if listen_mode?
+        start_webserver 
+
         listen_options = {}
         listen_options[:dry_run] = true if dry_run?
 
