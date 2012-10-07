@@ -88,6 +88,10 @@ module Rivendell::Import
 
       Thread.new do
         Rivendell::Import::Application.run!
+
+        # FIXME we don't see difference between normal quit and start error (EADDRINUSE, ...)
+        Rivendell::Import.logger.debug "Webserver is stopped"
+        exit 0
       end
     end
       
