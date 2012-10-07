@@ -81,6 +81,7 @@ describe Rivendell::Import::CLI do
     before(:each) do
       subject.stub :paths => %w{file1 file2}
       subject.stub :start_webserver
+      subject.stub :config_loader => mock(:load => true)
       subject.import.tasks.stub :run => true
     end
 
@@ -90,9 +91,7 @@ describe Rivendell::Import::CLI do
     end
 
     it "should load config_file" do
-      subject.stub :config_file => "dummy.rb"
-      subject.should_receive(:load).with(subject.config_file)
-
+      subject.config_loader.should_receive(:load)
       subject.run
     end
 
@@ -174,6 +173,19 @@ describe Rivendell::Import::CLI do
         subject.setup_logger
       end
 
+    end
+
+  end
+
+  describe "#config_loader" do
+    
+    it "should use config_file" do
+      subject.config_loader.file.should == subject.config_file
+    end
+
+    it "should be auto_reload if listen mode is enabled" do
+      subject.stub :listen_mode? => true, :config_file => "dummy"
+      subject.config_loader.should be_auto_reload
     end
 
   end

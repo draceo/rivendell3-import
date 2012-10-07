@@ -34,6 +34,8 @@ ActiveRecord::Base.include_root_in_json = false
 
 require "rivendell/api"
 
+require "rivendell/import/config"
+require "rivendell/import/config_loader"
 require "rivendell/import/worker"
 require "rivendell/import/task"
 require "rivendell/import/tasks"

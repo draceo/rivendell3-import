@@ -94,6 +94,10 @@ module Rivendell::Import
         exit 0
       end
     end
+
+    def config_loader
+      ConfigLoader.new(config_file, listen_mode?)
+    end
       
     def run
       setup_logger
@@ -104,9 +108,7 @@ module Rivendell::Import
         Rivendell::Import.establish_connection
       end
 
-      if config_file
-        load config_file
-      end
+      config_loader.load
 
       start_webserver
 
