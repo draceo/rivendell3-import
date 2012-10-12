@@ -32,6 +32,14 @@ module Rivendell::Import
       options[:syslog]
     end
 
+    def daemonize?
+      options[:daemon]
+    end
+
+    def pid_directory
+      options[:pid_dir] or Dir.pwd
+    end
+
     def database
       options[:database]
     end
@@ -44,6 +52,8 @@ module Rivendell::Import
         opt :debug, "Enable debug messages (in stderr)"
         opt :syslog, "Log messages to syslog"
         opt :database, "The database file used to store tasks", :type => String
+        opt :daemon, "Run in background"
+        opt :pid_dir, "Directory to store pid"
       end
     end
 
@@ -98,6 +108,13 @@ module Rivendell::Import
     def config_loader
       ConfigLoader.new(config_file, listen_mode?)
     end
+
+    def daemonize
+      if daemonize?
+        require 'daemons'
+        Daemons.daemonize :app_name => "rivendell-import", :dir => pid_directory, :dir_mode => :normal
+      end
+    end
       
     def run
       setup_logger
@@ -109,6 +126,7 @@ module Rivendell::Import
       end
 
       config_loader.load
+      daemonize
 
       if listen_mode?
         start_webserver 

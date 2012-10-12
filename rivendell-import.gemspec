@@ -28,6 +28,8 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sinatra'
   gem.add_runtime_dependency 'will_paginate', '~> 3.0.0'
 
+  gem.add_runtime_dependency 'daemons'
+
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "guard"
