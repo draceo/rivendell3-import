@@ -53,7 +53,7 @@ module Rivendell::Import
         opt :syslog, "Log messages to syslog"
         opt :database, "The database file used to store tasks", :type => String
         opt :daemon, "Run in background"
-        opt :pid_dir, "Directory to store pid"
+        opt :pid_dir, "Directory to store pid", :type => String
       end
     end
 

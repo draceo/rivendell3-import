@@ -49,6 +49,28 @@ describe Rivendell::Import::CLI do
 
   end
 
+  describe "daemonize?" do
+    
+    it "should return true when --daemon is specified" do
+      subject.arguments << "--daemon"
+      subject.should be_daemonize
+    end
+
+  end
+
+  describe "pid_directory" do
+    
+    it "should return directory given with --pid-dir" do
+      subject.arguments << "--pid-dir" << "dummy"
+      subject.pid_directory.should == "dummy"
+    end
+
+    it "should be current directory by default" do
+      subject.pid_directory.should == Dir.pwd
+    end
+
+  end
+
   describe "#import" do
 
     it "should return a Rivendell::Import::Base instance" do
