@@ -7,8 +7,6 @@ module Rivendell::Import
     def initialize(file, auto_reload = false)
       self.file = file
       self.auto_reload = auto_reload
-
-      listen_file if auto_reload?
     end
 
     def load
@@ -16,6 +14,8 @@ module Rivendell::Import
     end
 
     def listen_file
+      return unless auto_reload?
+
       callback = Proc.new do |modified, added, removed|
         if modified.include? absolute_path
           Rivendell::Import.logger.info "Configuration changed, reload it"
@@ -25,6 +25,20 @@ module Rivendell::Import
 
       Rivendell::Import.logger.info "Listen to config file changes (#{file})"
       Listen.to(directory).filter(/^#{basename}$/).change(&callback).start(false)
+    end
+
+    def listen_file_with_inotify
+      require 'rb-inotify'
+
+      notifier = INotify::Notifier.new.watch(file, :modify) do
+        Rivendell::Import.logger.info "Configuration changed, reload it"
+        load
+      end
+
+      Thread.new do
+        Rivendell::Import.logger.info "Listen to config modification (#{file})"
+        notifier.run
+      end
     end
 
     def absolute_path

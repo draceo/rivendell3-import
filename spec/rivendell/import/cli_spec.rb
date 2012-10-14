@@ -103,7 +103,7 @@ describe Rivendell::Import::CLI do
     before(:each) do
       subject.stub :paths => %w{file1 file2}
       subject.stub :start_webserver
-      subject.stub :config_loader => mock(:load => true)
+      subject.stub :config_loader => mock(:load => true, :listen_file => true)
       subject.import.tasks.stub :run => true
     end
 

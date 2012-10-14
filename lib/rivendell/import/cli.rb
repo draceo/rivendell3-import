@@ -128,6 +128,8 @@ module Rivendell::Import
       config_loader.load
       daemonize
 
+      config_loader.listen_file
+
       if listen_mode?
         start_webserver 
 
