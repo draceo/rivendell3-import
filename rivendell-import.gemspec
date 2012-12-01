@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'listen'
   gem.add_runtime_dependency 'httmultiparty'
-  gem.add_runtime_dependency 'rivendell-api', '~> 0.0.3'
+  gem.add_runtime_dependency 'rivendell-api', '~> 0.0.4'
   gem.add_runtime_dependency 'trollop'
   gem.add_runtime_dependency 'activerecord', '~> 3.2.8'
   gem.add_runtime_dependency 'activesupport', '~> 3.2.8'
