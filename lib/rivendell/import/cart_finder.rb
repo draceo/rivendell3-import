@@ -1,5 +1,5 @@
 module Rivendell::Import
-  class CartsCache
+  class CartFinder
 
     attr_accessor :xport
 

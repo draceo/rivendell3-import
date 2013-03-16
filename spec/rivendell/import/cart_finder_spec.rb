@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Rivendell::Import::CartsCache do
+describe Rivendell::Import::CartFinder do
 
-  let(:carts_cache) { Rivendell::Import::CartsCache.new(xport) }
-  subject { carts_cache }
+  let(:cart_finder) { Rivendell::Import::CartFinder.new(xport) }
+  subject { cart_finder }
 
   let(:cart) { mock :title => "dummy" }
   let(:carts) { [ cart ] }
@@ -41,7 +41,7 @@ describe Rivendell::Import::CartsCache do
 
   describe "#default_normalizer" do
 
-    subject { carts_cache.default_normalizer }
+    subject { cart_finder.default_normalizer }
 
     it "should downcase string" do
       subject.call("ABC").should == "abc"
