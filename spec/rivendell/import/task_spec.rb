@@ -280,4 +280,25 @@ describe Rivendell::Import::Task do
 
   end
 
+  describe ".purge!" do
+    
+    it "should remove tasks older than 24 hours" do
+      old_task = Rivendell::Import::Task.create! :file => file, :created_at => 25.hours.ago
+      Rivendell::Import::Task.purge!
+      Rivendell::Import::Task.exists?(old_task).should be_false
+    end
+
+    it "should keep recent tasks" do
+      task = Rivendell::Import::Task.create! :file => file
+      Rivendell::Import::Task.purge!
+      Rivendell::Import::Task.exists?(task).should be_true
+    end
+
+    it "should be invoked each time a new Task is created" do
+      Rivendell::Import::Task.should_receive(:purge!)
+      Rivendell::Import::Task.create! :file => file
+    end
+
+  end
+
 end

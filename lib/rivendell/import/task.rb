@@ -99,5 +99,15 @@ module Rivendell::Import
       save!
     end
 
+    after_create :purge!
+
+    def purge!
+      self.class.purge!
+    end
+
+    def self.purge!
+      where("created_at < ?", 24.hours.ago).destroy_all
+    end
+
   end
 end
