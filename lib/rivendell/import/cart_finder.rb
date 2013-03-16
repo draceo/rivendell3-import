@@ -1,12 +1,6 @@
 module Rivendell::Import
   class CartFinder
 
-    attr_accessor :xport
-
-    def initialize(xport)
-      @xport = xport
-    end
-
     def find_all_by_title(string, options = {})
       normalizer = options.delete(:normalizer) || Proc.new { |id| id }
 
@@ -18,7 +12,7 @@ module Rivendell::Import
     
     def default_normalizer
       Proc.new do |string|
-        string.downcase.gsub(/[^a-z0-9]/," ").gsub(/[ ]+/," ")
+        ActiveSupport::Multibyte::Chars.new(string).normalize(:kd).gsub(/[^\x00-\x7F]/n,'').downcase.to_s.gsub(/[^a-z0-9]/," ").gsub(/[ ]+/," ")
       end
     end
 
@@ -32,26 +26,36 @@ module Rivendell::Import
       matching_carts.first if matching_carts.one?
     end
 
-    def cache
-      clear if purged_at < time_to_live.ago
-      @cache ||= {}
-    end
+    class ByApi < CartFinder
 
-    def clear
-      @cache = nil
-    end
+      attr_accessor :xport
 
-    @@time_to_live = 600
-    cattr_accessor :time_to_live
+      def initialize(xport)
+        @xport = xport
+      end
 
-    attr_accessor :purged_at
+      def cache
+        clear if purged_at < time_to_live.ago
+        @cache ||= {}
+      end
 
-    def purged_at
-      @purged_at ||= Time.now
-    end
+      def clear
+        @cache = nil
+      end
 
-    def carts(options = {})
-      cache[options.to_s] ||= xport.list_carts(options)
+      @@time_to_live = 600
+      cattr_accessor :time_to_live
+      
+      attr_accessor :purged_at
+      
+      def purged_at
+        @purged_at ||= Time.now
+      end
+      
+      def carts(options = {})
+        cache[options.to_s] ||= xport.list_carts(options)
+      end
+
     end
 
   end

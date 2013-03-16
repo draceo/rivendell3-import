@@ -48,3 +48,7 @@ require "rivendell/import/file"
 require "rivendell/import/notification"
 require "rivendell/import/notifier/base"
 require "rivendell/import/notifier/mail"
+
+# TODO Rivendell::Import::CartFinder::ByDb should be optional
+require 'rivendell/db'
+require 'rivendell/import/cart_finder_by_db'

@@ -1,18 +1,13 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 describe Rivendell::Import::CartFinder do
 
-  let(:cart_finder) { Rivendell::Import::CartFinder.new(xport) }
-  subject { cart_finder }
-
   let(:cart) { mock :title => "dummy" }
   let(:carts) { [ cart ] }
 
-  let(:xport) { mock }
-
-  before do
-    subject.stub :xport => xport
-  end
+  let(:cart_finder) { Rivendell::Import::CartFinder.new }
+  subject { cart_finder }
 
   describe "#find_all_by_title" do
 
@@ -54,8 +49,49 @@ describe Rivendell::Import::CartFinder do
     it "should remove double spaces" do
       subject.call("a  b   c").should == "a b c"
     end
+
+    it "should remove accents" do
+      subject.call("Ç'est évident").should == "c est evident"
+    end
     
   end
+
+  describe "#find_by_title" do
+
+    before do
+      subject.stub(:carts).and_return(carts)
+    end
+    
+    it "should try an exact match" do
+      subject.find_by_title(cart.title).should == cart
+    end
+
+    it "should try a match with default normalizer" do
+      subject.find_by_title(cart.title.upcase).should == cart
+    end
+
+    it "should return nil when no cart matchs" do
+      subject.find_by_title("nothing").should be_nil
+    end
+
+    it "should return nil when several carts match" do
+      carts << cart
+      subject.find_by_title(cart.title).should be_nil
+    end
+
+  end
+
+end
+
+describe Rivendell::Import::CartFinder::ByApi do
+
+  let(:cart_finder) { Rivendell::Import::CartFinder::ByApi.new(xport) }
+  subject { cart_finder }
+
+  let(:xport) { mock }
+
+  let(:cart) { mock :title => "dummy" }
+  let(:carts) { [ cart ] }
 
   describe "#carts" do
 
@@ -82,27 +118,29 @@ describe Rivendell::Import::CartFinder do
 
   end
 
-  describe "#find_by_title" do
+end
+
+describe Rivendell::Import::CartFinder::ByDb do
+
+  let(:cart_finder) { Rivendell::Import::CartFinder::ByDb.new }
+  subject { cart_finder }
+
+  let(:cart) { mock :title => "dummy" }
+  let(:carts) { [ cart ] }
+
+  describe "#carts" do
 
     before do
-      subject.stub(:carts).and_return(carts)
+      Rivendell::DB::Cart.stub :all => carts
     end
     
-    it "should try an exact match" do
-      subject.find_by_title(cart.title).should == cart
+    it "should return Carts found in database" do
+      subject.carts.should == carts
     end
 
-    it "should try a match with default normalizer" do
-      subject.find_by_title(cart.title.upcase).should == cart
-    end
-
-    it "should return nil when no cart matchs" do
-      subject.find_by_title("nothing").should be_nil
-    end
-
-    it "should return nil when several carts match" do
-      carts << cart
-      subject.find_by_title(cart.title).should be_nil
+    it "should search in specified group if present" do
+      Rivendell::DB::Cart.should_receive(:all).with(hash_including(:group_name => "dummy")).and_return(carts)
+      subject.carts(:group => "dummy")
     end
 
   end

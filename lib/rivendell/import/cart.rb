@@ -66,10 +66,21 @@ module Rivendell::Import
       self.clear_cuts = true
     end
 
-    def cart_finder
-      @cart_finder ||= Rivendell::Import::CartFinder.new(xport)
-    end
+    @db_url = nil
+    cattr_accessor :db_url
 
+    def cart_finder
+      @cart_finder ||= 
+        begin
+          unless db_url 
+            Rivendell::Import::CartFinder::ByApi.new xport
+          else
+            Rivendell::DB.establish_connection(db_url)
+            Rivendell::Import::CartFinder::ByDb.new
+          end
+        end
+    end
+    
   end
 end
   
