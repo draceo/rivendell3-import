@@ -30,6 +30,8 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'daemons'
 
+  gem.add_runtime_dependency 'rivendell-db'
+
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "guard"
