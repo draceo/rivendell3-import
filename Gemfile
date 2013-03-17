@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 gemspec
 
-gem "rivendell-db", :path => "~/Projects/RivendellDb"
+# gem "rivendell-db", :path => "~/Projects/RivendellDb"
 
 if RUBY_PLATFORM =~ /linux/
   gem 'libnotify' 
