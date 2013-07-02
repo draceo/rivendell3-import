@@ -46,7 +46,7 @@ module Rivendell::Import
 
     def parser
       @parser ||= Trollop::Parser.new do
-        opt :config, "Configuration file", :type => String, :required => true
+        opt :config, "Configuration file", :type => String #, :required => true
         opt :listen, "Wait for files in given directory"
         opt :dry_run, "Just create tasks without executing them"
         opt :debug, "Enable debug messages (in stderr)"

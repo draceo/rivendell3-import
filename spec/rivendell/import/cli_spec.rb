@@ -5,7 +5,7 @@ require 'rivendell/import/cli'
 describe Rivendell::Import::CLI do
 
   describe "#config_file" do
-    
+
     it "should return file specified with --config" do
       subject.arguments << "--config" << "dummy"
       subject.config_file.should == "dummy"
@@ -19,11 +19,11 @@ describe Rivendell::Import::CLI do
       subject.arguments << "--listen"
       subject.should be_listen_mode
     end
-    
+
   end
 
   describe "dry_run?" do
-    
+
     it "should return true when --dry-run is specified" do
       subject.arguments << "--dry-run"
       subject.should be_dry_run
@@ -32,7 +32,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "debug?" do
-    
+
     it "should return true when --debug is specified" do
       subject.arguments << "--debug"
       subject.should be_debug
@@ -41,7 +41,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "syslog?" do
-    
+
     it "should return true when --syslog is specified" do
       subject.arguments << "--syslog"
       subject.should be_syslog
@@ -50,7 +50,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "daemonize?" do
-    
+
     it "should return true when --daemon is specified" do
       subject.arguments << "--daemon"
       subject.should be_daemonize
@@ -59,7 +59,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "pid_directory" do
-    
+
     it "should return directory given with --pid-dir" do
       subject.arguments << "--pid-dir" << "dummy"
       subject.pid_directory.should == "dummy"
@@ -80,7 +80,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "#paths" do
-    
+
     it "should return arguments after options" do
       subject.arguments << "--listen"
       subject.arguments << "file1" << "file2"
@@ -90,7 +90,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "#database" do
-    
+
     it "should return file specified with --dabase" do
       subject.arguments << "--database" << "tasks.sqlite3"
       subject.database.should == "tasks.sqlite3"
@@ -132,7 +132,7 @@ describe Rivendell::Import::CLI do
         subject.stub :listen_mode? => true
         subject.stub :paths => [directory]
       end
-  
+
       it "should use listen import" do
         subject.import.should_receive(:listen).with(directory, {})
         subject.run
@@ -156,7 +156,7 @@ describe Rivendell::Import::CLI do
       before(:each) do
         subject.stub :listen_mode? => false
       end
-  
+
       it "should use process import" do
         subject.import.should_receive(:process).with(subject.paths)
         subject.run
@@ -179,11 +179,11 @@ describe Rivendell::Import::CLI do
       end
 
     end
-    
+
   end
 
   describe "#setup_logger" do
-    
+
     context " with syslog option" do
 
       before do
@@ -200,7 +200,7 @@ describe Rivendell::Import::CLI do
   end
 
   describe "#config_loader" do
-    
+
     it "should use config_file" do
       subject.config_loader.file.should == subject.config_file
     end

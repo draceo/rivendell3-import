@@ -5,7 +5,7 @@ describe Rivendell::Import::Base do
   describe "#prepare_task" do
 
     let(:task) { mock }
-    
+
     it "should prepare task with to_prepare block" do
       subject.to_prepare = Proc.new {}
       task.should_receive :prepare
@@ -22,13 +22,13 @@ describe Rivendell::Import::Base do
       subject.stub :default_to_prepare => block
       subject.to_prepare.should == block
     end
-                           
+
   end
 
   describe "#create_task" do
 
     let(:file) { Rivendell::Import::File.new "dummy.wav" }
-    
+
     it "should create a task with given file" do
       Rivendell::Import::Task.should_receive(:create).with({:file => file}, {})
       subject.create_task file
@@ -44,7 +44,7 @@ describe Rivendell::Import::Base do
   describe "#file" do
 
     let(:file) { Rivendell::Import::File.new("dummy.wav") }
-    
+
     it "should create a File with given path and base_directory" do
       Rivendell::Import::File.should_receive(:new).with("path", :base_directory => "base_directory")
       subject.file "path", "base_directory"
@@ -59,11 +59,11 @@ describe Rivendell::Import::Base do
   end
 
   describe "#directory" do
-    
+
     it "should look for files in given directory" do
-      Dir.mktmpdir do |directory| 
+      Dir.mktmpdir do |directory|
         FileUtils.mkdir "#{directory}/subdirectory"
-        
+
         file = "#{directory}/subdirectory/dummy.wav"
         FileUtils.touch file
 
@@ -73,9 +73,9 @@ describe Rivendell::Import::Base do
     end
 
   end
-  
+
   describe "#process" do
-    
+
     it "should use file method when path isn't a directory" do
       File.stub :directory? => false
       subject.should_receive(:file).with("dummy")
@@ -93,7 +93,7 @@ describe Rivendell::Import::Base do
   describe "#listen" do
 
     before(:each) do
-      Listen.stub :to => true
+      Listen.stub :to => mock(:change => mock(:start! => true))
     end
 
     let(:directory) { "directory" }
@@ -103,7 +103,7 @@ describe Rivendell::Import::Base do
       worker.stub :start => worker
       Rivendell::Import::Worker.stub :new => worker
     end
-    
+
     it "should create a Worker" do
       Rivendell::Import::Worker.should_receive(:new).with(subject).and_return(worker)
       subject.listen directory
@@ -122,12 +122,6 @@ describe Rivendell::Import::Base do
 
     it "should invoke Listen.to with given directory" do
       Listen.should_receive(:to).with(directory)
-      subject.listen directory
-    end
-
-    it "should invoke file with added files" do
-      Listen.stub(:to).and_yield(nil,%w{file},nil)
-      subject.should_receive(:file).with("file", directory)
       subject.listen directory
     end
 
