@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rivendell-import (0.0.4)
+    rivendell-import (0.0.5)
       SyslogLogger (~> 2.0)
       activerecord (~> 3.2.8)
       activesupport (~> 3.2.8)
