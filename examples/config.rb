@@ -15,7 +15,6 @@ end
 Rivendell::Import::Notifier::Mail.from = "root@tryphon.eu"
 
 Rivendell::Import.config do |config|
-
   config.rivendell.host = "localhost"
   config.rivendell.login_name = "user"
   config.rivendell.password = ""
@@ -29,7 +28,7 @@ Rivendell::Import.config do |config|
       cart.clear_cuts!
       cart.find_by_title file.basename
     end
-    
+
     cart.group ||= "TEST"
 
     # To delete file when task is completed

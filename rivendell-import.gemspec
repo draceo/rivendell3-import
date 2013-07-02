@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Rivendell::Import::VERSION
 
-  gem.add_runtime_dependency 'listen'
+  gem.add_runtime_dependency 'listen', '~> 1.2.1'
   gem.add_runtime_dependency 'httmultiparty'
   gem.add_runtime_dependency 'rivendell-api', '~> 0.0.4'
   gem.add_runtime_dependency 'trollop'

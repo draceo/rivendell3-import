@@ -46,7 +46,7 @@ module Rivendell::Import
 
     def parser
       @parser ||= Trollop::Parser.new do
-        opt :config, "Configuration file", :type => String
+        opt :config, "Configuration file", :type => String, :required => true
         opt :listen, "Wait for files in given directory"
         opt :dry_run, "Just create tasks without executing them"
         opt :debug, "Enable debug messages (in stderr)"
@@ -78,7 +78,7 @@ module Rivendell::Import
       parsed_parser.leftovers
     end
 
-    def setup_logger 
+    def setup_logger
       new_logger =
         if syslog?
           Syslog::Logger.new('rivendell-import').tap do |syslog|
@@ -115,7 +115,7 @@ module Rivendell::Import
         Daemons.daemonize :app_name => "rivendell-import", :dir => pid_directory, :dir_mode => :normal
       end
     end
-      
+
     def run
       setup_logger
 
@@ -131,7 +131,7 @@ module Rivendell::Import
       config_loader.listen_file
 
       if listen_mode?
-        start_webserver 
+        start_webserver
 
         listen_options = {}
         listen_options[:dry_run] = true if dry_run?

@@ -19,12 +19,12 @@ module Rivendell::Import
       callback = Proc.new do |modified, added, removed|
         if modified.include? absolute_path
           Rivendell::Import.logger.info "Configuration changed, reload it"
-          load 
+          load
         end
       end
 
       Rivendell::Import.logger.info "Listen to config file changes (#{file})"
-      Listen.to(directory).filter(/^#{basename}$/).change(&callback).start(false)
+      Listen.to(directory).filter(/^#{basename}$/).change(&callback).start
     end
 
     def listen_file_with_inotify

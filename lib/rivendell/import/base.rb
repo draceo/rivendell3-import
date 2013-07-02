@@ -22,12 +22,15 @@ module Rivendell::Import
       workers << Worker.new(self).start unless options[:dry_run]
 
       Rivendell::Import.logger.info "Listen files in #{directory}"
-      Listen.to(directory) do |modified, added, removed|
+
+      callback = Proc.new do |modified, added, removed|
         added.each do |file|
           Rivendell::Import.logger.debug "Detected file '#{file}'"
           file(file, directory)
         end
       end
+
+      Listen.to(directory).change(&callback).start!
     end
 
     def process(*paths)
