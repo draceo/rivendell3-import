@@ -44,7 +44,7 @@ module Rivendell::Import
     end
 
     def modification_age
-      Time.now - ::File.mtime(path)
+      Time.now - ::File.mtime(path) if exists?
     end
 
     def in(directory, &block)
