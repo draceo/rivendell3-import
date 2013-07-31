@@ -11,9 +11,13 @@ module Rivendell::Import
     include Rivendell::Import::Tasking::Cart
     include Rivendell::Import::Tasking::Status
     include Rivendell::Import::Tasking::Destination
-    
+
     def self.pending
       where :status => "pending"
+    end
+
+    def self.ready
+      self.pending.select(&:ready?)
     end
 
     def self.ran
@@ -71,6 +75,22 @@ module Rivendell::Import
     end
     after_status_changed :notify!, :on => [:completed, :failed]
 
+    def ready?
+      status.pending? and file_ready?
+    end
+
+    def detailed_status
+      if status.pending? and not ready?
+        "waiting"
+      else
+        status
+      end
+    end
+
+    def file_ready?
+      file.modification_age > 10
+    end
+
     def destroy_file!
       file.destroy! if delete_file?
     end
@@ -94,7 +114,7 @@ module Rivendell::Import
       logger.debug e.backtrace.join("\n")
     ensure
       unless status.completed?
-        change_status! :failed 
+        change_status! :failed
       end
       save!
     end

@@ -24,9 +24,15 @@ module Rivendell::Import
       Rivendell::Import.logger.info "Listen files in #{directory}"
 
       callback = Proc.new do |modified, added, removed|
-        added.each do |file|
-          Rivendell::Import.logger.debug "Detected file '#{file}'"
-          file(file, directory)
+        # Rivendell::Import.logger.debug [modified, added, removed].inspect
+        begin
+          added.each do |file|
+            Rivendell::Import.logger.debug "Detected file '#{file}'"
+            file(file, directory)
+          end
+        rescue Exception => e
+          Rivendell::Import.logger.error "Task creation failed : #{e}"
+          Rivendell::Import.logger.debug e.backtrace.join("\n")
         end
       end
 
@@ -41,6 +47,7 @@ module Rivendell::Import
     end
 
     def file(path, base_directory = nil)
+      path = ::File.expand_path(path, base_directory)
       file = Rivendell::Import::File.new path, :base_directory => base_directory
       create_task file
     end

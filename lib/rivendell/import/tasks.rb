@@ -2,11 +2,11 @@ module Rivendell::Import
   class Tasks
 
     def pop
-      Task.pending.first
+      Task.ready.first
     end
 
     def run
-      Task.pending.find_each(&:run)
+      Task.ready.each(&:run)
     end
 
     def create(file, &block)

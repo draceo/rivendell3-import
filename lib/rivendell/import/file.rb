@@ -43,9 +43,13 @@ module Rivendell::Import
       end
     end
 
+    def modification_age
+      Time.now - ::File.mtime(path)
+    end
+
     def in(directory, &block)
       if match %r{^#{directory}/}
-        yield 
+        yield
       end
     end
 
