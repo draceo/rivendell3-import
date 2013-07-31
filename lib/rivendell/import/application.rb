@@ -8,6 +8,7 @@ module Rivendell::Import
 
     set :public_folder, ::File.expand_path('static', ::File.dirname(__FILE__))
     # set :static_cache_control, [:public, :max_age => 3600]
+    set :bind, '0.0.0.0'
 
     get '/' do
       redirect "/tasks", 302
@@ -50,4 +51,3 @@ module Rivendell::Import
 
   end
 end
-
