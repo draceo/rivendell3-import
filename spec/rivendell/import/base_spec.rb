@@ -46,7 +46,7 @@ describe Rivendell::Import::Base do
     let(:file) { Rivendell::Import::File.new("dummy.wav") }
 
     it "should create a File with given path and base_directory" do
-      Rivendell::Import::File.should_receive(:new).with("path", :base_directory => "base_directory")
+      Rivendell::Import::File.should_receive(:new).with(File.expand_path("path", "base_directory"), :base_directory => "base_directory")
       subject.file "path", "base_directory"
     end
 

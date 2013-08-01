@@ -43,6 +43,14 @@ module Rivendell::Import
       end
     end
 
+    def ready?
+      if age = file.modification_age
+        age > 10
+      else
+        false
+      end
+    end
+
     def modification_age
       Time.now - ::File.mtime(path) if exists?
     end

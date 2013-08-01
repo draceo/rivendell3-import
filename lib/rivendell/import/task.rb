@@ -88,9 +88,7 @@ module Rivendell::Import
     end
 
     def file_ready?
-      if age = file.modification_age
-        age > 10
-      end
+      file.ready?
     end
 
     def destroy_file!
