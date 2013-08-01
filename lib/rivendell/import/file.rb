@@ -44,7 +44,7 @@ module Rivendell::Import
     end
 
     def ready?
-      if age = file.modification_age
+      if age = modification_age
         age > 10
       else
         false
