@@ -15,7 +15,9 @@ module Rivendell::Import
     end
 
     get '/tasks' do
-      erb :index, :locals => { :tasks => tasks.paginate(:page => params[:page], :per_page => 15) }
+      tasks = self.tasks.paginate(:page => params[:page], :per_page => (params[:per_page] or 15))
+      tasks = tasks.search(params[:search]) if params[:search]
+      erb :index, :locals => { :tasks => tasks }
     end
 
     get '/tasks.json' do

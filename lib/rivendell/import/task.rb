@@ -24,6 +24,10 @@ module Rivendell::Import
       where :status => %w{completed failed}
     end
 
+    def self.search(text)
+      where [ "lower(file_name) like ?", "%#{text.downcase}%" ]
+    end
+
     def ran?
       status.completed? or status.failed?
     end
