@@ -17,6 +17,7 @@ module Rivendell::Import
       return unless auto_reload?
 
       callback = Proc.new do |modified, added, removed|
+        Rivendell::Import.logger.debug "Configuration changed ? #{[modified, added, removed].inspect}"
         if modified.include? absolute_path
           Rivendell::Import.logger.info "Configuration changed, reload it"
           load
