@@ -5,7 +5,7 @@ module Rivendell::Import
     include ActiveModel::Serializers::JSON
 
     def attributes
-      %w{number group clear_cuts?}.inject({}) do |map, attribute|
+      %w{number group clear_cuts? title default_title}.inject({}) do |map, attribute|
         value = send attribute
         map[attribute] = value if value
         map
@@ -18,7 +18,7 @@ module Rivendell::Import
 
     delegate :blank?, :to => :attributes
 
-    attr_accessor :number, :group
+    attr_accessor :number, :group, :title, :default_title
     attr_reader :task
 
     def initialize(task = nil)
@@ -37,9 +37,18 @@ module Rivendell::Import
     end
 
     def update
-      # xport.edit_cart # to define title, etc ...
+      update_attributes = attributes.dup
+
+      if default_title
+        current_cart = xport.list_cart(number)
+        unless current_cart.has_title?
+          update_attributes[:title] = default_title
+        end
+      end
+
+      xport.edit_cart number, update_attributes
     end
-    
+
     def cut
       @cut ||= Cut.new(self)
     end
@@ -70,9 +79,9 @@ module Rivendell::Import
     cattr_accessor :db_url
 
     def cart_finder
-      @cart_finder ||= 
+      @cart_finder ||=
         begin
-          unless db_url 
+          unless db_url
             Rivendell::Import::CartFinder::ByApi.new xport
           else
             Rivendell::DB.establish_connection(db_url)
@@ -80,7 +89,6 @@ module Rivendell::Import
           end
         end
     end
-    
+
   end
 end
-  
