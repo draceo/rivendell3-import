@@ -24,6 +24,11 @@
       <div id="content">
         <%= will_paginate tasks %>
 
+        <form action=""/>
+          <input type="text" name="search" value="<%= params[:search] %>"/>
+          <input type="submit" value="Search"/>
+        </form>
+
         <table>
           <tr>
             <th>#</th>

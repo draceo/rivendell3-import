@@ -135,3 +135,9 @@ em { font-style: italic; }
 #content table tr.odd {
   background-color: #EAEAEA;
 }
+#content .pagination {
+  float: right;
+}
+#content form {
+  margin-bottom: 10px;
+}
