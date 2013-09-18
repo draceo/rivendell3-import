@@ -20,6 +20,8 @@ Rivendell::Import.config do |config|
   config.rivendell.password = ""
 
   config.to_prepare do |file|
+    cart.default_title = file.basename
+
     file.in("music") do
       cart.group = "MUSIC"
     end
