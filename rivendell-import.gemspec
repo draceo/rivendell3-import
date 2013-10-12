@@ -17,6 +17,8 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'listen', '~> 1.2.1'
   gem.add_runtime_dependency 'httmultiparty'
+  # 0.12.0 requires ruby 1.9.3
+  gem.add_runtime_dependency 'httparty', '0.11.0'
   gem.add_runtime_dependency 'rivendell-api', '~> 0.0.4'
   gem.add_runtime_dependency 'trollop'
   gem.add_runtime_dependency 'activerecord', '~> 3.2.8'
