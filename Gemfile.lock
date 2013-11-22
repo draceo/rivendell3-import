@@ -132,6 +132,8 @@ GEM
       ffi (>= 0.5.0)
     rb-kqueue (0.2.0)
       ffi (>= 0.5.0)
+    rdoc (3.12.2)
+      json (~> 1.4)
     rivendell-api (0.0.5)
       activesupport
       httmultiparty
@@ -183,6 +185,7 @@ DEPENDENCIES
   libnotify
   rake
   rb-inotify
+  rdoc
   rivendell-import!
   rspec
   simplecov
