@@ -22,17 +22,16 @@ module Rivendell::Import
       workers << Worker.new(self).start unless options[:dry_run]
 
       Rivendell::Import.logger.info "Listen files in #{directory}"
-
       callback = Proc.new do |modified, added, removed|
         # Rivendell::Import.logger.debug [modified, added, removed].inspect
-        begin
-          added.each do |file|
+        added.each do |file|
+          begin
             Rivendell::Import.logger.debug "Detected file '#{file}'"
             file(file, directory)
+          rescue Exception => e
+            Rivendell::Import.logger.error "Task creation failed : #{e}"
+            Rivendell::Import.logger.debug e.backtrace.join("\n")
           end
-        rescue Exception => e
-          Rivendell::Import.logger.error "Task creation failed : #{e}"
-          Rivendell::Import.logger.debug e.backtrace.join("\n")
         end
       end
 
