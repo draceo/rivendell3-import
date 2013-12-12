@@ -12,12 +12,16 @@ Mail.defaults do
   delivery_method :smtp, { :address => "smtp.free.fr" }
 end
 
+# Rivendell::API::Xport.debug_output $stdout
+
 Rivendell::Import::Notifier::Mail.from = "root@tryphon.eu"
 
 Rivendell::Import.config do |config|
   config.rivendell.host = "localhost"
   config.rivendell.login_name = "user"
   config.rivendell.password = ""
+
+  config.rivendell.db_url = 'mysql://rduser:letmein@localhost/Rivendell'
 
   config.to_prepare do |file|
     cart.default_title = file.basename
@@ -27,8 +31,14 @@ Rivendell::Import.config do |config|
     end
 
     file.in("pad") do
+      name = file.basename
+      if name.match /-lundi$/
+        cart.cut.days = %w{mon}
+        name.gsub! /-lundi$/, ""
+      end
+
       cart.clear_cuts!
-      cart.find_by_title file.basename
+      cart.find_by_title name
     end
 
     cart.group ||= "TEST"

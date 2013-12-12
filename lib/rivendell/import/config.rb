@@ -25,6 +25,10 @@ module Rivendell::Import
         Task.default_xport_options[:password] = password
       end
 
+      def db_url=(url)
+        Database.url = url
+      end
+
     end
 
   end

@@ -4,16 +4,30 @@ module Rivendell::Import
     include ActiveModel::Serialization
     include ActiveModel::Serializers::JSON
 
+    def as_json(options = {})
+      super options.merge(:root => false)
+    end
+
     def attributes
-      %w{number group clear_cuts? title default_title}.inject({}) do |map, attribute|
+      attributes = {}
+      %w{number group clear_cuts title default_title}.each do |attribute|
         value = send attribute
-        map[attribute] = value if value
-        map
+        attributes[attribute] = value if value
       end
+      if (cut_attributes = cut.attributes).present?
+        attributes["cut"] = cut_attributes
+      end
+      attributes
     end
 
     def attributes=(attributes)
-      attributes.each { |k,v| send "#{k}=", v }
+      attributes.each do |k,v|
+        unless k == "cut"
+          send "#{k}=", v
+        else
+          cut.attributes = v
+        end
+      end
     end
 
     delegate :blank?, :to => :attributes
@@ -60,14 +74,21 @@ module Rivendell::Import
     def import(file)
       raise "File #{file.path} not found" unless file.exists?
 
+      if clear_cuts?
+        Rivendell::Import.logger.debug "Clear cuts of Cart #{number}"
+        xport.clear_cuts number
+      end
       cut.create
-      xport.clear_cuts number if clear_cuts?
+
+      Rivendell::Import.logger.debug "Import #{file.path} in Cut #{cut.number}"
       xport.import number, cut.number, file.path, import_options
       cut.update
     end
 
     def find_by_title(string, options = {})
+      Rivendell::Import.logger.debug "Looking for a Cart '#{string}'"
       if remote_cart = cart_finder.find_by_title(string, options)
+        Rivendell::Import.logger.debug "Found Cart #{remote_cart.number}"
         self.number = remote_cart.number
         self.import_options[:use_metadata] = false
       end
@@ -80,18 +101,12 @@ module Rivendell::Import
       self.clear_cuts = true
     end
 
-    @db_url = nil
-    cattr_accessor :db_url
-
     def cart_finder
       @cart_finder ||=
-        begin
-          unless db_url
-            Rivendell::Import::CartFinder::ByApi.new xport
-          else
-            Rivendell::DB.establish_connection(db_url)
-            Rivendell::Import::CartFinder::ByDb.new
-          end
+        unless Database.enabled?
+          Rivendell::Import::CartFinder::ByApi.new xport
+        else
+          Rivendell::Import::CartFinder::ByDb.new
         end
     end
 

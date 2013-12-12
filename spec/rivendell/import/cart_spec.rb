@@ -171,4 +171,37 @@ describe Rivendell::Import::Cart do
 
   end
 
+  describe "#attributes" do
+
+    it "should include clear_cuts value" do
+      subject.clear_cuts = true
+      subject.attributes["clear_cuts"].should == subject.clear_cuts
+    end
+
+    it "should include cut attributes" do
+      subject.cut.days = %{mon}
+      subject.attributes["cut"].should == { "days" => %{mon} }
+    end
+
+  end
+
+  describe "#to_json" do
+
+    it "should not include root" do
+      subject.cut.days = %{mon}
+      subject.to_json.should == '{"cut":{"days":"mon"}}'
+    end
+
+  end
+
+  describe "#attributes=" do
+
+    it "should set cut attributes" do
+      subject.attributes = { "cut" => { "days" => %{mon} } }
+      subject.cut.days.should == %{mon}
+    end
+
+  end
+
+
 end

@@ -16,7 +16,7 @@ describe Rivendell::Import::CartFinder do
     before do
       subject.stub(:carts).and_return(carts)
     end
-    
+
     it "should use carts with given options" do
       subject.should_receive(:carts).with(options).and_return(carts)
       subject.find_all_by_title("dummy", options)
@@ -53,7 +53,7 @@ describe Rivendell::Import::CartFinder do
     it "should remove accents" do
       subject.call("Ç'est évident").should == "c est evident"
     end
-    
+
   end
 
   describe "#find_by_title" do
@@ -61,7 +61,7 @@ describe Rivendell::Import::CartFinder do
     before do
       subject.stub(:carts).and_return(carts)
     end
-    
+
     it "should try an exact match" do
       subject.find_by_title(cart.title).should == cart
     end
@@ -98,7 +98,7 @@ describe Rivendell::Import::CartFinder::ByApi do
     before do
       subject.xport.stub :list_carts => carts
     end
-    
+
     it "should return Xport#list_carts result" do
       subject.carts.should == carts
     end
@@ -131,9 +131,10 @@ describe Rivendell::Import::CartFinder::ByDb do
   describe "#carts" do
 
     before do
+      Rivendell::Import::Database.stub :init
       Rivendell::DB::Cart.stub :all => carts
     end
-    
+
     it "should return Carts found in database" do
       subject.carts.should == carts
     end
