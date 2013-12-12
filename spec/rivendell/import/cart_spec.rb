@@ -178,6 +178,11 @@ describe Rivendell::Import::Cart do
       subject.attributes["clear_cuts"].should == subject.clear_cuts
     end
 
+    it "should include import_options value" do
+      subject.import_options = { :use_metadata => false }
+      subject.attributes["import_options"].should == { :use_metadata => false }
+    end
+
     it "should include cut attributes" do
       subject.cut.days = %{mon}
       subject.attributes["cut"].should == { "days" => %{mon} }

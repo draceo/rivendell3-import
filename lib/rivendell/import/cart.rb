@@ -10,9 +10,9 @@ module Rivendell::Import
 
     def attributes
       attributes = {}
-      %w{number group clear_cuts title default_title}.each do |attribute|
+      %w{number group clear_cuts title default_title import_options}.each do |attribute|
         value = send attribute
-        attributes[attribute] = value if value
+        attributes[attribute] = value if value.present?
       end
       if (cut_attributes = cut.attributes).present?
         attributes["cut"] = cut_attributes
@@ -67,6 +67,7 @@ module Rivendell::Import
       @cut ||= Cut.new(self)
     end
 
+    attr_accessor :import_options
     def import_options
       @import_options ||= {}
     end
