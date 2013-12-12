@@ -53,18 +53,23 @@ module Rivendell::Import
       @cut ||= Cut.new(self)
     end
 
+    def import_options
+      @import_options ||= {}
+    end
+
     def import(file)
       raise "File #{file.path} not found" unless file.exists?
 
       cut.create
       xport.clear_cuts number if clear_cuts?
-      xport.import number, cut.number, file.path
+      xport.import number, cut.number, file.path, import_options
       cut.update
     end
 
     def find_by_title(string, options = {})
       if remote_cart = cart_finder.find_by_title(string, options)
         self.number = remote_cart.number
+        self.import_options[:use_metadata] = false
       end
     end
 

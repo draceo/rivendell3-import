@@ -10,7 +10,7 @@ describe Rivendell::Import::Cart do
     it "should use the given task" do
       Rivendell::Import::Cart.new(task).task.should == task
     end
-    
+
   end
 
   describe "#xport" do
@@ -18,7 +18,7 @@ describe Rivendell::Import::Cart do
     before(:each) do
       task.stub :xport => mock
     end
-    
+
     it "should be task xport" do
       subject.xport.should == subject.task.xport
     end
@@ -64,7 +64,7 @@ describe Rivendell::Import::Cart do
         subject.group = nil
         lambda { subject.create }.should raise_error
       end
-                                         
+
     end
 
   end
@@ -85,14 +85,20 @@ describe Rivendell::Import::Cart do
       subject.number = 123
       subject.stub :cut => mock.as_null_object, :xport => mock.as_null_object
     end
-    
+
     it "should create Cut" do
       subject.cut.should_receive :create
       subject.import file
     end
 
     it "should import file via xport with Cart and Cut numbers" do
-      subject.xport.should_receive(:import).with(subject.number, subject.cut.number, file.path)
+      subject.xport.should_receive(:import).with(subject.number, subject.cut.number, file.path, {})
+      subject.import file
+    end
+
+    it "should use import options if specified" do
+      subject.import_options[:dummy] = true
+      subject.xport.should_receive(:import).with(subject.number, subject.cut.number, file.path, subject.import_options)
       subject.import file
     end
 
@@ -145,6 +151,11 @@ describe Rivendell::Import::Cart do
       subject.find_by_title("dummy", :group => "TEST")
     end
 
+    it "should add the import option :use_metadata => false" do
+      subject.find_by_title(cart.title)
+      subject.import_options[:use_metadata].should be_false
+    end
+
   end
 
   describe "#clear_cuts!" do
@@ -152,7 +163,7 @@ describe Rivendell::Import::Cart do
     before do
       subject.number = 123
     end
-    
+
     it "should set flag clear_cuts" do
       subject.clear_cuts!
       subject.clear_cuts.should be_true
