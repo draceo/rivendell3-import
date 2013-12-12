@@ -126,12 +126,15 @@ module Rivendell::Import
       end
 
       config_loader.load
+
       daemonize
 
       config_loader.listen_file
+      sleep 1
 
       if listen_mode?
         start_webserver
+        sleep 1
 
         listen_options = {}
         listen_options[:dry_run] = true if dry_run?

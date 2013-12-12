@@ -9,5 +9,4 @@ gem 'capistrano'
 
 if RUBY_PLATFORM =~ /linux/
   gem 'libnotify'
-  gem 'rb-inotify'
 end
