@@ -44,6 +44,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rdoc"
   gem.add_development_dependency "cucumber"
   gem.add_development_dependency "database_cleaner"
-  # gem.add_development_dependency "remarkable_activerecord"
 
+  # gem.add_development_dependency "remarkable_activerecord"
 end

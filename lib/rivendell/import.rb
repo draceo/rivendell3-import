@@ -19,8 +19,15 @@ module Rivendell
     @@logger = NullLogger.instance
     mattr_accessor :logger
 
-    def self.establish_connection(file = "db.sqlite3")
-      ActiveRecord::Base.establish_connection :adapter => "sqlite3", :database => file
+    def self.establish_connection(file_or_uri = "db.sqlite3")
+      database_spec =
+        if URI.parse(file_or_uri).scheme.in? [nil, "file"]
+          { :adapter => "sqlite3", :database => file_or_uri }
+        else
+          file_or_uri
+        end
+
+      ActiveRecord::Base.establish_connection database_spec
       ActiveRecord::Migrator.migrate(::File.expand_path("../../../db/migrate/", __FILE__), nil)
     end
 
