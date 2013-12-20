@@ -1,29 +1,14 @@
 # Rivendell::Import
 
-TODO: Write a gem description
+Next-Generation import interface for Rivendell
 
-## Installation
+## Initialize a dedicated MySQL database
 
-Add this line to your application's Gemfile:
+    $ mysqladmin create import
+    $ mysql mysql
+    mysql> GRANT ALL PRIVILEGES ON import.* TO 'import'@'localhost' IDENTIFIED BY 'import';
+    $ mysqladmin flush-privileges
 
-    gem 'rivendell-import'
+Then use :
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install rivendell-import
-
-## Usage
-
-TODO: Write usage instructions here
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+    rivendell-import [...] --database 'mysql://import:import@localhost/import' [...]
