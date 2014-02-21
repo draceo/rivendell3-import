@@ -39,6 +39,7 @@ describe Rivendell::Import::Cut do
 
     before do
       subject.number = 1
+      subject.cart.number = 1
     end
 
     context "when DB attributes are defined" do

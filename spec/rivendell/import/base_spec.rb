@@ -46,12 +46,11 @@ describe Rivendell::Import::Base do
     let(:file) { Rivendell::Import::File.new("dummy.wav") }
 
     it "should create a File with given path and base_directory" do
-      Rivendell::Import::File.should_receive(:new).with(File.expand_path("path", "base_directory"), :base_directory => "base_directory")
-      subject.file "path", "base_directory"
+      subject.file("path", "base_directory").file_path.should == File.expand_path("path", "base_directory")
     end
 
     it "should create a File with given path and base_directory" do
-      Rivendell::Import::File.stub :new=> file
+      Rivendell::Import::File.stub :new => file
       subject.should_receive(:create_task).with(file)
       subject.file "path", "base_directory"
     end
