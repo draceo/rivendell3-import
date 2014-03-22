@@ -14,6 +14,26 @@ describe Rivendell::Import::Cut do
 
   end
 
+  describe "#to_json" do
+
+    let(:json_clone) do
+      Rivendell::Import::Cut.new(cart).tap do |clone|
+        clone.from_json subject.to_json, false
+      end
+    end
+
+    it "should support datetime (Time range)" do
+      subject.datetime =  Time.parse("2014-03-20 00:00")..Time.parse("2014-03-21 23:59:59")
+      json_clone.datetime.should == subject.datetime
+    end
+
+    it "should support datepart (String range)" do
+      subject.daypart = "08:00:00".."12:00:00"
+      json_clone.daypart.should == subject.daypart
+    end
+
+  end
+
   describe "#create" do
 
     before(:each) do

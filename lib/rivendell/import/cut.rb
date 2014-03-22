@@ -16,7 +16,11 @@ module Rivendell::Import
     end
 
     def as_json(options = {})
-      super options.merge(:root => false)
+      super(options.merge(:root => false)).tap do |as_json|
+        as_json.each do |k,v|
+          as_json[k] = [v.begin, v.end] if v.is_a?(Range)
+        end
+      end
     end
 
     def attributes
@@ -68,6 +72,17 @@ module Rivendell::Import
 
         db_cut.save
       end
+    end
+
+    def datetime=(datetime)
+      datetime = (datetime.first)..(datetime.last) if Array === datetime
+      datetime = Time.parse(datetime.begin)..Time.parse(datetime.end) if String === datetime.first
+      @datetime = datetime
+    end
+
+    def daypart=(daypart)
+      daypart = (daypart.first)..(daypart.last) if Array === daypart
+      @daypart = daypart
     end
 
   end
