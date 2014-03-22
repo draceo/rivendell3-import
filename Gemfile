@@ -15,6 +15,7 @@ gemspec
 # gem "mysql"
 
 gem 'capistrano'
+gem 'simplecov-rcov'
 
 if RUBY_PLATFORM =~ /linux/
   gem 'libnotify'

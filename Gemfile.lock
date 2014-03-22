@@ -158,6 +158,8 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.5.3)
     simplecov-html (0.5.3)
+    simplecov-rcov (0.2.3)
+      simplecov (>= 0.4.1)
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -190,3 +192,4 @@ DEPENDENCIES
   rivendell-import!
   rspec
   simplecov
+  simplecov-rcov
