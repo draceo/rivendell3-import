@@ -51,16 +51,44 @@ module Rivendell::Import
     end
 
     def update
-      update_attributes = attributes.dup
+      begin
+        update_by_api
+      rescue => e
+        Rivendell::Import.logger.debug "Update by API failed : #{e}"
+        update_by_db if Database.enabled?
+      end
+    end
 
-      if default_title
-        current_cart = xport.list_cart(number)
-        unless current_cart.has_title?
-          update_attributes[:title] = default_title
-        end
+    def empty_title?(title)
+      not [ nil, "", "[new cart]" ].include? title
+    end
+
+    def update_by_api
+      update_attributes = {}
+
+      if title
+        update_attributes[:title] = title
+      else
+        update_attributes[:title] = default_title if default_title && empty_title?(xport.list_cart(number).title)
       end
 
-      xport.edit_cart number, update_attributes
+      unless update_attributes.empty?
+        Rivendell::Import.logger.debug "Update Cart by API : #{update_attributes}"
+        xport.edit_cart number, update_attributes
+      end
+    end
+
+    def update_by_db
+      Database.init
+
+      Rivendell::Import.logger.debug "Update Cart by DB"
+      current_cart = Rivendell::DB::Cart.get(number)
+      if title
+        current_cart.title = title
+      else
+        current_cart.title = default_title if default_title && empty_title?(current_cart.title)
+      end
+      current_cart.save
     end
 
     def cut

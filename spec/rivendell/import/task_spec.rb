@@ -6,7 +6,7 @@ describe Rivendell::Import::Task do
   subject { Rivendell::Import::Task.new :file => file }
 
   describe "#file" do
-   
+
     it "should return a file with specified path" do
       Rivendell::Import::Task.new(:file => file).file.should == file
     end
@@ -14,7 +14,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#cart" do
-    
+
     it "should return a Cart associated to the task" do
       subject.cart.task.should == subject
     end
@@ -22,7 +22,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#xport" do
-    
+
     it "should return a instance of Rivendell::API::Xport" do
       subject.xport.should be_instance_of(Rivendell::API::Xport)
     end
@@ -35,14 +35,14 @@ describe Rivendell::Import::Task do
   end
 
   describe "#xport_options" do
-    
+
     it "should use #default_xport_options" do
-      subject.stub :default_xport_options => { :host => "dummy" }  
+      subject.stub :default_xport_options => { :host => "dummy" }
       subject.xport_options.should == { :host => "dummy" }
     end
 
     it "should not modified #default_xport_options" do
-      subject.stub :default_xport_options => { :host => "dummy" }  
+      subject.stub :default_xport_options => { :host => "dummy" }
       subject.xport_options[:host] = "other"
       subject.default_xport_options.should == { :host => "dummy" }
     end
@@ -50,14 +50,14 @@ describe Rivendell::Import::Task do
   end
 
   describe "#prepare" do
-    
+
     it "should return the Task" do
       subject.prepare { |file| } .should == subject
     end
 
     it "should invoke the specified block with Task file" do
       given_file = nil
-      subject.prepare do |file| 
+      subject.prepare do |file|
         given_file = file
       end
       given_file.should == subject.file
@@ -71,7 +71,23 @@ describe Rivendell::Import::Task do
       subject.stub :destination => "test"
       subject.stub :cart => mock(:create => true, :import => true, :update => true, :number => 123, :to_json => '')
     end
-    
+
+    context "when task is canceled" do
+      before do
+        subject.status = "canceled"
+      end
+
+      it "should not create cart" do
+        subject.cart.should_not_receive(:create)
+        subject.run
+      end
+
+      it "keeps its canceled status" do
+        subject.run
+        expect(subject.status).to be_canceled
+      end
+    end
+
     it "should create Cart" do
       subject.cart.should_receive(:create)
       subject.run
@@ -101,7 +117,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#destination" do
-    
+
     it "should return 'Cart in group :group' if cart#group is defined" do
       subject.cart.group = 'dummy'
       subject.destination.should == "Cart in group dummy"
@@ -115,7 +131,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#tags" do
-    
+
     it "should be empty by default" do
       subject.tags.should be_empty
     end
@@ -123,12 +139,12 @@ describe Rivendell::Import::Task do
   end
 
   describe "#tag" do
-    
+
     it "should add the given tag" do
       subject.tag "dummy"
       subject.tags.should == %w{dummy}
     end
-    
+
   end
 
   describe "storage" do
@@ -163,14 +179,14 @@ describe Rivendell::Import::Task do
       subject.xport_options[:host] = "dummy"
       reloaded_task.xport_options[:host].should == "dummy"
     end
-    
+
   end
 
   describe "#status" do
-    
+
     it "should be include in pending, completed, failed" do
       pending
-      # subject.should validate_inclusion_of(:status, :in => %w{pending running completed failed})
+      # subject.should validate_inclusion_of(:status, :in => %w{pending running completed failed canceled})
     end
 
     it "should be pending by default" do
@@ -180,7 +196,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#notifications" do
-    
+
     before(:each) do
       subject.save!
     end
@@ -198,7 +214,7 @@ describe Rivendell::Import::Task do
     end
 
     let(:notifier) { Rivendell::Import::Notifier::Test.create! }
-    
+
     it "should create a Notification when a Notifier is added" do
       subject.notifiers << notifier
       subject.notifications.first.notifier.should == notifier
@@ -207,7 +223,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#notify!" do
-    
+
     before(:each) do
       subject.status = "completed"
       subject.save!
@@ -215,7 +231,7 @@ describe Rivendell::Import::Task do
     end
 
     let(:notifier) { Rivendell::Import::Notifier::Test.create! }
-    
+
     it "should notify task with all associated notifiers" do
       subject.notify!
       notifier.notified_tasks.should == [ subject ]
@@ -229,7 +245,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#change_status!" do
-    
+
     it "should update_attribute :status" do
       subject.should_receive(:update_attribute).with(:status, "completed")
       subject.change_status! :completed
@@ -248,7 +264,7 @@ describe Rivendell::Import::Task do
   end
 
   describe "#delete_file!" do
-    
+
     it "should set flag delete_file" do
       subject.delete_file!
       subject.delete_file.should be_true
@@ -259,14 +275,14 @@ describe Rivendell::Import::Task do
       before do
         subject.stub :cart => mock.as_null_object
       end
-      
+
 
       it "should destroy! file when task is completed" do
         subject.delete_file!
         subject.file.should_receive(:destroy!)
         subject.run
       end
-                  
+
     end
 
     context "not defined" do
@@ -275,13 +291,13 @@ describe Rivendell::Import::Task do
         subject.file.should_not_receive(:destroy!)
         subject.run
       end
-                  
+
     end
 
   end
 
   describe ".purge!" do
-    
+
     it "should remove tasks older than 24 hours" do
       old_task = Rivendell::Import::Task.create! :file => file, :created_at => 25.hours.ago
       Rivendell::Import::Task.purge!
@@ -297,6 +313,53 @@ describe Rivendell::Import::Task do
     it "should be invoked each time a new Task is created" do
       Rivendell::Import::Task.should_receive(:purge!)
       Rivendell::Import::Task.create! :file => file
+    end
+
+  end
+
+  describe "#ran?" do
+
+    it "should be true when status is completed" do
+      subject.status = "completed"
+      expect(subject).to be_ran
+    end
+
+    it "should be true when status is failed" do
+      subject.status = "failed"
+      expect(subject).to be_ran
+    end
+
+    it "should be true when status is canceled" do
+      subject.status = "canceled"
+      expect(subject).to be_ran
+    end
+
+  end
+
+  describe ".ran" do
+
+    it "should return completed tasks" do
+      subject.change_status! "completed"
+      expect(Rivendell::Import::Task.ran).to include(subject)
+    end
+
+    it "should return failed tasks" do
+      subject.change_status! "failed"
+      expect(Rivendell::Import::Task.ran).to include(subject)
+    end
+
+    it "should return canceled tasks" do
+      subject.change_status! "canceled"
+      expect(Rivendell::Import::Task.ran).to include(subject)
+    end
+
+  end
+
+  describe "#cancel!" do
+
+    it "should change task status to canceled" do
+      subject.cancel!
+      expect(subject.status).to be_canceled
     end
 
   end

@@ -24,6 +24,8 @@ Rivendell::Import.config do |config|
   config.rivendell.db_url = 'mysql://rduser:letmein@localhost/Rivendell'
 
   config.to_prepare do |file|
+    # task.cancel!
+
     cart.default_title = file.basename
 
     file.in("music") do

@@ -20,8 +20,10 @@ module Rivendell::Import
       self.pending.select(&:ready?)
     end
 
+    RAN_STATUSES = %w{completed failed canceled}.freeze
+
     def self.ran
-      where :status => %w{completed failed}
+      where :status => RAN_STATUSES
     end
 
     def self.search(text)
@@ -29,7 +31,7 @@ module Rivendell::Import
     end
 
     def ran?
-      status.completed? or status.failed?
+      status.in? RAN_STATUSES
     end
 
     @@default_xport_options = {}
@@ -99,7 +101,16 @@ module Rivendell::Import
       file.destroy! if delete_file?
     end
 
+    def cancel!
+      self.status = "canceled"
+    end
+
     def run
+      if status.canceled?
+        logger.debug "Don't run canceled task : #{self.inspect}"
+        return
+      end
+
       logger.debug "Run #{self.inspect}"
       change_status! :running
 
@@ -117,7 +128,7 @@ module Rivendell::Import
       logger.error "Task failed : #{e}"
       logger.debug e.backtrace.join("\n")
     ensure
-      unless status.completed?
+      unless ran?
         change_status! :failed
       end
       save!

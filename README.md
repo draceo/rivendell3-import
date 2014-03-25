@@ -2,6 +2,10 @@
 
 Next-Generation import interface for Rivendell
 
+## Run examples
+
+    bundle exec ./bin/rivendell-import --config examples/config.rb --listen examples --debug
+
 ## Initialize a dedicated MySQL database
 
     $ mysqladmin create import
