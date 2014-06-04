@@ -60,7 +60,7 @@ module Rivendell::Import
     end
 
     def empty_title?(title)
-      not [ nil, "", "[new cart]" ].include? title
+      [ nil, "", "[new cart]" ].include? title
     end
 
     def update_by_api

@@ -208,5 +208,21 @@ describe Rivendell::Import::Cart do
 
   end
 
+  describe "#empty_title?" do
+
+    it "should true when title is nil" do
+      subject.empty_title?(nil).should be_true
+    end
+
+    it "should true when title is '[new cart]'" do
+      subject.empty_title?('[new cart]').should be_true
+    end
+
+    it "should false when title is anything else" do
+      subject.empty_title?('dummy').should be_false
+    end
+
+  end
+
 
 end
