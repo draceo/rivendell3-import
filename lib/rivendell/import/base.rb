@@ -45,7 +45,20 @@ module Rivendell::Import
       end
     end
 
+    attr_accessor :file_patterns
+    def file_patterns
+      @file_patterns ||= ["**/*", "*"]
+    end
+
+    def ignore?(path)
+      not file_patterns.any? do |file_pattern|
+        ::File.fnmatch file_pattern, path, ::File::FNM_PATHNAME | ::File::FNM_CASEFOLD
+      end
+    end
+
     def file(path, base_directory = nil)
+      return if ignore? path
+
       path = ::File.expand_path(path, base_directory)
       file = Rivendell::Import::File.new path, :base_directory => base_directory
       create_task file

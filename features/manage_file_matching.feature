@@ -1,7 +1,4 @@
-Feature: Manage Cart attributes
-  In order to organize dropboxes
-  An user
-  wants to filter files by name
+Feature: Manage file matching
 
   Scenario: Select a file by Ruby regexp
     Given a configuration with this prepare block

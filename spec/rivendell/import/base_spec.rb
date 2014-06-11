@@ -126,4 +126,25 @@ describe Rivendell::Import::Base do
 
   end
 
+  describe "#ignore?" do
+
+    context "when default file patterns" do
+
+      it "should ignore hidden file" do
+        subject.ignore?("path/to/.nfs00000000074200420000000c").should be_true
+        subject.ignore?(".nfs00000000074200420000000c").should be_true
+      end
+
+      it "should accept files in directories" do
+        subject.ignore?("path/to/normal_file.mp3").should be_false
+      end
+
+      it "should accept files in root directory" do
+        subject.ignore?("file").should be_false
+      end
+
+    end
+
+  end
+
 end
