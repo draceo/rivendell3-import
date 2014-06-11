@@ -48,27 +48,11 @@ describe Rivendell::Import do
 
     context "when an url is given" do
 
-      context "when mysql scheme is used" do
+      let(:url) { 'mysql://import:import@localhost/import' }
 
-        let(:url) { 'mysql://import:import@localhost/import' }
-
-        it "should initialize database with given url and reconnect option" do
-          options = { :adapter => "mysql", :database => url, :reconnect => true }
-          ActiveRecord::Base.should_receive(:establish_connection).with options
-          Rivendell::Import.establish_connection url
-        end
-
-      end
-
-      context "when no special scheme is detected" do
-
-        let(:url) { 'dummy://import:import@localhost/import' }
-
-        it "should initialize database with given url" do
-          ActiveRecord::Base.should_receive(:establish_connection).with url
-          Rivendell::Import.establish_connection url
-        end
-
+      it "should initialize database with given url" do
+        ActiveRecord::Base.should_receive(:establish_connection).with(url)
+        Rivendell::Import.establish_connection url
       end
 
     end
