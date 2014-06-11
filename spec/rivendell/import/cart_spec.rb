@@ -224,5 +224,44 @@ describe Rivendell::Import::Cart do
 
   end
 
+  describe "update" do
 
+    it "should invoke update_by_api" do
+      subject.should_receive :update_by_api
+      subject.update
+    end
+
+    context "when when update_by_api fails" do
+
+      before do
+        subject.stub(:update_by_api).and_raise("#fail")
+      end
+
+      context "when database is enabled" do
+
+        before do
+          Rivendell::Import::Database.stub :enabled? => true
+        end
+
+        it "should invoke update_by_db " do
+          subject.should_receive :update_by_db
+          subject.update
+        end
+
+      end
+
+      context "when database is disabled" do
+
+        before do
+          Rivendell::Import::Database.stub :enabled? => false
+        end
+
+        it "should not invoke update_by_db " do
+          subject.should_not_receive :update_by_db
+          subject.update
+        end
+
+      end
+    end
+  end
 end
