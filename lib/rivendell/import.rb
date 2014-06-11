@@ -21,8 +21,11 @@ module Rivendell
 
     def self.establish_connection(file_or_uri = "db.sqlite3")
       database_spec =
-        if URI.parse(file_or_uri).scheme.in? [nil, "file"]
+        case URI.parse(file_or_uri).scheme
+        when nil, "file"
           { :adapter => "sqlite3", :database => file_or_uri }
+        when "mysql"
+          { :adapter => "mysql", :database => file_or_uri, :reconnect => true }
         else
           file_or_uri
         end
