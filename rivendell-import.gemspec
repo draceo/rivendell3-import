@@ -33,7 +33,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'daemons'
 
-  gem.add_runtime_dependency 'rivendell-db', '~> 0.2'
+  gem.add_runtime_dependency 'rivendell-db', '~> 0.3'
 
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "rspec"

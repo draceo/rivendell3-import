@@ -10,7 +10,7 @@ module Rivendell::Import
 
     def attributes
       attributes = {}
-      %w{number group clear_cuts title default_title import_options}.each do |attribute|
+      %w{number group clear_cuts title default_title scheduler_codes import_options}.each do |attribute|
         value = send attribute
         attributes[attribute] = value if value.present?
       end
@@ -32,11 +32,15 @@ module Rivendell::Import
 
     delegate :blank?, :to => :attributes
 
-    attr_accessor :number, :group, :title, :default_title
+    attr_accessor :number, :group, :title, :default_title, :scheduler_codes
     attr_reader :task
 
     def initialize(task = nil)
       @task = task
+    end
+
+    def scheduler_codes
+      @scheduler_codes ||= []
     end
 
     def xport
@@ -58,7 +62,7 @@ module Rivendell::Import
 
     def updaters
       [].tap do |updaters|
-        updaters << ApiUpdater
+        updaters << ApiUpdater if scheduler_codes.empty?
         updaters << DbUpdater if Database.enabled?
       end
     end
@@ -70,7 +74,7 @@ module Rivendell::Import
       def initialize(cart)
         @cart = cart
       end
-      delegate :number, :title, :default_title, :to => :cart
+      delegate :number, :title, :default_title, :scheduler_codes, :to => :cart
 
       def empty_title?(title)
         [ nil, "", "[new cart]" ].include? title
@@ -134,9 +138,10 @@ module Rivendell::Import
       def update!
         Database.init
 
-        if title_with_default
+        if title_with_default or not scheduler_codes.empty?
           Rivendell::Import.logger.debug "Update Cart by DB"
           current_cart.title = title_with_default
+          current_cart.scheduler_codes = scheduler_codes
           current_cart.save
         end
       end

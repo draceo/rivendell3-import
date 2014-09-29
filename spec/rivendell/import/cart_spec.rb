@@ -188,6 +188,11 @@ describe Rivendell::Import::Cart do
       subject.attributes["cut"].should == { "days" => %{mon} }
     end
 
+    it "should include scheduler codes" do
+      subject.scheduler_codes << "dummy"
+      subject.attributes["scheduler_codes"].should == ["dummy"]
+    end
+    
   end
 
   describe "#to_json" do
@@ -213,7 +218,12 @@ describe Rivendell::Import::Cart do
     it "should contain ApiUpdater" do
       subject.updaters.should include(Rivendell::Import::Cart::ApiUpdater)
     end
-
+ 
+    it "should not contain ApiUpdater if scheduler codes is defined" do
+      subject.scheduler_codes << "dummy"
+      subject.updaters.should_not include(Rivendell::Import::Cart::ApiUpdater)
+    end
+   
     it "should contain DbUpdater if Database is enabled" do
       Rivendell::Import::Database.stub :enabled? => true
       subject.updaters.should include(Rivendell::Import::Cart::DbUpdater)
@@ -429,6 +439,12 @@ describe Rivendell::Import::Cart::DbUpdater do
       subject.stub title_with_default: "dummy"
       subject.update!
       db_cart.title.should == subject.title_with_default
+    end
+
+    it "should define scheduler_codes" do
+      subject.stub scheduler_codes: ["dummy"]
+      subject.update!
+      db_cart.scheduler_codes.should == subject.scheduler_codes
     end
     
   end
