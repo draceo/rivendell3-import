@@ -51,44 +51,96 @@ module Rivendell::Import
     end
 
     def update
-      begin
-        update_by_api
-      rescue => e
-        Rivendell::Import.logger.debug "Update by API failed : #{e}"
-        update_by_db if Database.enabled?
+      updaters.any? do |updater|
+        updater.new(self).update
       end
     end
 
-    def empty_title?(title)
-      [ nil, "", "[new cart]" ].include? title
-    end
-
-    def update_by_api
-      update_attributes = {}
-
-      if title
-        update_attributes[:title] = title
-      else
-        update_attributes[:title] = default_title if default_title && empty_title?(xport.list_cart(number).title)
-      end
-
-      unless update_attributes.empty?
-        Rivendell::Import.logger.debug "Update Cart by API : #{update_attributes}"
-        xport.edit_cart number, update_attributes
+    def updaters
+      [].tap do |updaters|
+        updaters << ApiUpdater
+        updaters << DbUpdater if Database.enabled?
       end
     end
 
-    def update_by_db
-      Database.init
+    class Updater
 
-      Rivendell::Import.logger.debug "Update Cart by DB"
-      current_cart = Rivendell::DB::Cart.get(number)
-      if title
-        current_cart.title = title
-      else
-        current_cart.title = default_title if default_title && empty_title?(current_cart.title)
+      attr_accessor :cart
+      
+      def initialize(cart)
+        @cart = cart
       end
-      current_cart.save
+      delegate :number, :title, :default_title, :to => :cart
+
+      def empty_title?(title)
+        [ nil, "", "[new cart]" ].include? title
+      end
+
+      def title_with_default
+        @title_with_default ||=
+          if title
+            title
+          else
+            default_title if default_title && empty_title?(current_title)
+          end
+      end
+      
+      def update
+        begin
+          update!
+        rescue => e
+          Rivendell::Import.logger.debug "#{self.class.name} failed : #{e}"
+          false
+        end
+      end
+
+    end
+
+    class ApiUpdater < Updater
+
+      def update!
+        unless attributes.empty?
+          Rivendell::Import.logger.debug "Update Cart by API : #{attributes}"
+          xport.edit_cart number, attributes
+        else
+          true
+        end
+      end
+
+      delegate :xport, :to => :cart
+
+      def current_title
+        xport.list_cart(number).title
+      end
+
+      def attributes
+        {}.tap do |attributes|
+          attributes[:title] = title_with_default if title_with_default
+        end
+      end
+
+    end
+
+    class DbUpdater < Updater
+
+      def current_cart
+        @current_cart ||= Rivendell::DB::Cart.get(number)
+      end
+
+      def current_title
+        current_cart.title
+      end
+
+      def update!
+        Database.init
+
+        if title_with_default
+          Rivendell::Import.logger.debug "Update Cart by DB"
+          current_cart.title = title_with_default
+          current_cart.save
+        end
+      end
+
     end
 
     def cut

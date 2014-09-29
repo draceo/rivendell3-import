@@ -208,6 +208,55 @@ describe Rivendell::Import::Cart do
 
   end
 
+  describe "#updaters" do
+
+    it "should contain ApiUpdater" do
+      subject.updaters.should include(Rivendell::Import::Cart::ApiUpdater)
+    end
+
+    it "should contain DbUpdater if Database is enabled" do
+      Rivendell::Import::Database.stub :enabled? => true
+      subject.updaters.should include(Rivendell::Import::Cart::DbUpdater)
+    end
+
+    it "should not contain DbUpdater if Database isn't enabled" do
+      Rivendell::Import::Database.stub :enabled? => false
+      subject.updaters.should_not include(Rivendell::Import::Cart::DbUpdater)
+    end
+    
+  end
+
+  describe "#update" do
+
+    def updater(success = true)
+      double(:new => mock(:update => success))
+    end
+
+    it "should return true if an Updater is successful" do
+      subject.stub :updaters => [updater(false), updater(true)]
+      subject.update.should be_true
+    end
+
+    it "should return true if all Updaters are not successful" do
+      subject.stub :updaters => [updater(false)]
+      subject.update.should be_false
+    end
+
+    it "should return false when no Updater is available" do
+      subject.stub :updaters => []
+      subject.update.should be_false
+    end
+    
+  end
+  
+end
+
+describe Rivendell::Import::Cart::Updater do
+
+  let(:task) { mock }
+  let(:cart) { Rivendell::Import::Cart.new task }
+  subject { Rivendell::Import::Cart::Updater.new cart }
+
   describe "#empty_title?" do
 
     it "should true when title is nil" do
@@ -224,44 +273,164 @@ describe Rivendell::Import::Cart do
 
   end
 
-  describe "update" do
+  describe "#update" do
 
-    it "should invoke update_by_api" do
-      subject.should_receive :update_by_api
-      subject.update
+    it "should return false if update! raises an error" do
+      subject.stub(:update!).and_raise("fail")
+      subject.update.should be_false
     end
 
-    context "when when update_by_api fails" do
-
-      before do
-        subject.stub(:update_by_api).and_raise("#fail")
-      end
-
-      context "when database is enabled" do
-
-        before do
-          Rivendell::Import::Database.stub :enabled? => true
-        end
-
-        it "should invoke update_by_db " do
-          subject.should_receive :update_by_db
-          subject.update
-        end
-
-      end
-
-      context "when database is disabled" do
-
-        before do
-          Rivendell::Import::Database.stub :enabled? => false
-        end
-
-        it "should not invoke update_by_db " do
-          subject.should_not_receive :update_by_db
-          subject.update
-        end
-
-      end
+    it "should return true if update! returns true" do
+      subject.stub :update! => true
+      subject.update.should be_true
     end
+
+    it "should return false if update! returns false" do
+      subject.stub :update! => false
+      subject.update.should be_false
+    end
+    
   end
+
+  describe "#title_with_default" do
+
+    context "when Cart title is defined" do
+
+      before { cart.title = "dummy" }
+
+      it "should use this Cart title" do
+        subject.title_with_default.should == cart.title
+      end
+
+    end
+
+    context "when default title is defined" do
+
+      before { cart.default_title = "dummy" }
+      
+      it "should default title if current title is empty" do
+        subject.stub current_title: "[new cart]"
+        subject.title_with_default.should == cart.default_title
+      end
+
+      it "should not use default title if current title is not empty" do
+        subject.stub current_title: "Dummy"
+        subject.title_with_default.should be_nil
+      end
+
+    end
+    
+  end
+  
+end
+
+describe Rivendell::Import::Cart::ApiUpdater do
+
+  let(:task) { mock }
+  let(:cart) { Rivendell::Import::Cart.new task }
+  subject { Rivendell::Import::Cart::ApiUpdater.new cart }
+
+  let(:xport) { mock }
+
+  before do
+    subject.stub xport: xport
+  end
+
+  describe "#current_title" do
+
+    it "should retrive the current title via the API" do
+      xport_cart = mock(title: "dummy")
+      xport.should_receive(:list_cart).with(cart.number).and_return(xport_cart)
+      subject.current_title.should == xport_cart.title
+    end
+    
+  end
+
+  describe "#attributes" do
+
+    it "should use title with default" do
+      subject.stub title_with_default: "dummy"
+      subject.attributes.should == { title: subject.title_with_default }
+    end
+
+    it "should not contain title when title_with_default is nil" do
+      subject.stub title_with_default: nil
+      subject.attributes.should == {}
+    end
+    
+  end
+
+  describe "#update!" do
+
+    context "when attributes is not empty" do
+
+      it "should invoke xport edit_cart with attributes" do
+        subject.stub attributes: { title: "dummy" }
+        xport.should_receive(:edit_cart).with(cart.number, subject.attributes)
+        subject.update!
+      end
+      
+    end
+
+    context "when attributes is empty" do
+
+      it "should not invoke xport edit_cart" do
+        subject.stub attributes: {}
+        xport.should_not_receive(:edit_cart)
+        subject.update!.should be_true
+      end
+      
+    end
+    
+  end
+  
+end
+
+describe Rivendell::Import::Cart::DbUpdater do
+
+  let(:task) { mock }
+  let(:cart) { Rivendell::Import::Cart.new task }
+  subject { Rivendell::Import::Cart::DbUpdater.new cart }
+
+  let(:db_cart) { Rivendell::DB::Cart.new }
+
+  before do
+    Rivendell::Import::Database.stub init: true
+    db_cart.stub save: true
+    Rivendell::DB::Cart.stub get: db_cart
+  end
+
+  describe "#current_cart" do
+
+    it "should get cart with its number" do
+      Rivendell::DB::Cart.should_receive(:get).with(cart.number).and_return(db_cart)
+      subject.current_cart.should == db_cart
+    end
+    
+  end
+
+  describe "#current_title" do
+
+    it "should return current_cart title" do
+      db_cart.stub title: "dummy"
+      subject.current_title.should == db_cart.title
+    end
+    
+  end
+
+  describe "#update!" do
+
+    it "should init database" do
+      Rivendell::Import::Database.should_receive :init
+      subject.update!
+    end
+
+    it "should use title_with_default as Cart title" do
+      subject.stub title_with_default: "dummy"
+      subject.update!
+      db_cart.title.should == subject.title_with_default
+    end
+    
+  end
+  
 end
