@@ -31,6 +31,16 @@ module Rivendell::Import
       ::File.extname(name).gsub(/^\./,'')
     end
 
+    def directories
+      filename = path
+      [].tap do |directories|
+        while (parent = ::File.dirname(filename)) != ::File::SEPARATOR
+          directories << ::File.basename(parent)
+          filename = parent
+        end
+      end.reverse
+    end
+
     def ==(other)
       other and path == other.path
     end
