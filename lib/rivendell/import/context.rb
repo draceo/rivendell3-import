@@ -20,6 +20,10 @@ module Rivendell::Import
       end
     end
 
+    def log(message)
+      logger.info message if message
+    end
+
     def run(&block)
       instance_exec file, &block if block_given?
     end
