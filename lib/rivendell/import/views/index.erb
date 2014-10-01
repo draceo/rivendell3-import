@@ -45,7 +45,7 @@
             <td><%= distance_of_time_in_words_from_now(task.updated_at) %></td>
             <td><%= truncate_filename(task.file, 60) %></td>
             <td><%= task.destination %></td>
-            <td>default</td>
+            <td><%= task.priority or "default" %></td>
           </tr>
           <% end %>
         </table>

@@ -17,7 +17,11 @@ module Rivendell::Import
     end
 
     def self.ready
-      self.pending.select(&:ready?)
+      pending.by_priority.select(&:ready?)
+    end
+
+    def self.by_priority
+      order(["priority desc", "created_at"])
     end
 
     RAN_STATUSES = %w{completed failed canceled}.freeze

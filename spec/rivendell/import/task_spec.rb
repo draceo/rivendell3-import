@@ -112,7 +112,7 @@ describe Rivendell::Import::Task do
       subject.file.should_receive :close
       subject.run
     end
-    
+
     it "should change the status to failed if an error is raised" do
       subject.cart.stub(:create).and_raise("dummy")
       subject.run
@@ -365,6 +365,27 @@ describe Rivendell::Import::Task do
     it "should change task status to canceled" do
       subject.cancel!
       expect(subject.status).to be_canceled
+    end
+
+  end
+
+  describe "#ready" do
+
+    def task(attributes = {})
+      attributes = { :file => file }.merge(attributes)
+      Rivendell::Import::Task.create attributes
+    end
+
+    it "should return Task order by priority" do
+      lower_priority_task = task priority: 1, created_at: 5.minutes.ago
+      higher_priority_task = task priority: 2
+      Rivendell::Import::Task.ready.should == [ higher_priority_task, lower_priority_task ]
+    end
+
+    it "should return Task order by creation date" do
+      new_task = task
+      old_task = task created_at: 5.minutes.ago
+      Rivendell::Import::Task.ready.should == [ old_task, new_task ]
     end
 
   end
