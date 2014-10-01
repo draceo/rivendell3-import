@@ -4,6 +4,7 @@ require "null_logger"
 require "active_support/core_ext/module/attribute_accessors"
 require "active_support/core_ext/module/delegation"
 require "active_support/core_ext/enumerable"
+require 'taglib'
 
 require "rivendell/import/config"
 

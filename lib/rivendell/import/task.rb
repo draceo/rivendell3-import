@@ -128,6 +128,8 @@ module Rivendell::Import
       logger.error "Task failed : #{e}"
       logger.debug e.backtrace.join("\n")
     ensure
+      close_file
+      
       unless ran?
         change_status! :failed
       end

@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe Rivendell::Import::File do
 
-  subject { Rivendell::Import::File.new "/path/to/dummy.wav", :base_directory => "/path/to" }
+  subject { Rivendell::Import::File.new fixture_file("audio.ogg"), :base_directory => fixture_directory }
+
+  after do
+    subject.close
+  end
 
   describe "initialization" do
 
@@ -63,10 +67,35 @@ describe Rivendell::Import::File do
   describe "#directories" do
 
     it "should return 'path' and 'to' for 'path/to/dummy.wav'" do
-      subject.stub :name => "path/to/dummy.wav"
+      subject.stub :path => "/path/to/dummy.wav"
       subject.directories.should == %w{path to}
     end
 
+  end
+
+  describe "#tag" do
+
+    it "should return tags contained by file metadata" do
+      subject.tag.title.should == "Audio Test Content"
+    end
+
+  end
+
+  describe "#audio_properties" do
+
+    it "should file audio properties" do
+      subject.audio_properties.length.should == 60
+    end
+
+  end
+
+  describe "#close" do
+
+    it "should close TaLib file_ref" do
+      subject.file_ref.should_receive :close
+      subject.close
+    end
+    
   end
 
 end

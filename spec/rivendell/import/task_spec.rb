@@ -108,6 +108,11 @@ describe Rivendell::Import::Task do
       subject.status.should be_completed
     end
 
+    it "should close the used file" do
+      subject.file.should_receive :close
+      subject.run
+    end
+    
     it "should change the status to failed if an error is raised" do
       subject.cart.stub(:create).and_raise("dummy")
       subject.run

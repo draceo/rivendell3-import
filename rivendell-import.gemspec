@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'mail'
   gem.add_runtime_dependency 'sqlite3'
   gem.add_runtime_dependency 'SyslogLogger', '~> 2.0'
+  gem.add_runtime_dependency 'taglib-ruby'
 
   gem.add_runtime_dependency 'sinatra'
   gem.add_runtime_dependency 'will_paginate', '~> 3.0.0'

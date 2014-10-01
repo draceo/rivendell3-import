@@ -22,5 +22,9 @@ module Rivendell::Import::Tasking
       self.delete_file = true
     end
 
+    def close_file
+      @file.close if @file
+    end
+
   end
 end
