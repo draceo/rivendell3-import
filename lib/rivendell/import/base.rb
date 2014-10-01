@@ -35,7 +35,7 @@ module Rivendell::Import
         end
       end
 
-      Listen.to(directory).change(&callback).start!
+      Listen.to(directory, latency: 1, wait_for_delay: 5).change(&callback).start!
     end
 
     def process(*paths)

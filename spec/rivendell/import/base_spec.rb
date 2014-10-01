@@ -120,7 +120,7 @@ describe Rivendell::Import::Base do
     end
 
     it "should invoke Listen.to with given directory" do
-      Listen.should_receive(:to).with(directory)
+      Listen.should_receive(:to).with(directory, anything)
       subject.listen directory
     end
 
