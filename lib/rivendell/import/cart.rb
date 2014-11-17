@@ -70,7 +70,7 @@ module Rivendell::Import
     class Updater
 
       attr_accessor :cart
-      
+
       def initialize(cart)
         @cart = cart
       end
@@ -88,7 +88,7 @@ module Rivendell::Import
             default_title if default_title && empty_title?(current_title)
           end
       end
-      
+
       def update
         begin
           update!
@@ -140,8 +140,8 @@ module Rivendell::Import
 
         if title_with_default or not scheduler_codes.empty?
           Rivendell::Import.logger.debug "Update Cart by DB"
-          current_cart.title = title_with_default
-          current_cart.scheduler_codes = scheduler_codes
+          current_cart.title = title_with_default if title_with_default
+          current_cart.scheduler_codes = scheduler_codes unless scheduler_codes.empty?
           current_cart.save
         end
       end
