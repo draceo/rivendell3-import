@@ -7,6 +7,8 @@ module Rivendell::Import
     attr_reader :cart
 
     attr_accessor :number
+    attr_accessor :description, :outcue, :isrc, :isci
+
     attr_accessor :datetime
     attr_accessor :daypart
     attr_accessor :days
@@ -24,7 +26,7 @@ module Rivendell::Import
     end
 
     def attributes
-      %w{datetime daypart days}.inject({}) do |map, attribute|
+      %w{description outcue isrc isci datetime daypart days}.inject({}) do |map, attribute|
         value = send attribute
         map[attribute] = value if value
         map
@@ -46,6 +48,14 @@ module Rivendell::Import
 
     def name
       "%06d_%03d" % [cart.number, number]
+    end
+
+    def api_attributes
+      attributes.extract!("description", "outcue", "isrc", "isci").delete_if { |_,v| v.blank? }
+    end
+
+    def api_attributes?
+      api_attributes.present?
     end
 
     def db_attributes?
@@ -71,6 +81,10 @@ module Rivendell::Import
         Rivendell::Import.logger.debug "Change Cut #{number} in DB #{db_cut.inspect}"
 
         db_cut.save
+      end
+      if api_attributes?
+        Rivendell::Import.logger.debug "Change Cut #{number} via API #{api_attributes.inspect}"
+        xport.edit_cut cart.number, number, api_attributes
       end
     end
 

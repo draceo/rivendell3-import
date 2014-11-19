@@ -114,6 +114,20 @@ describe Rivendell::Import::Cut do
 
     end
 
+    context "when API attributes are defined" do
+
+      before do
+        subject.description = "dummy"
+        subject.stub :xport => mock
+      end
+
+      it "should invoke xport to edit cut" do
+        subject.xport.should_receive(:edit_cut).with(subject.cart.number, subject.number, "description" => subject.description)
+        subject.update
+      end
+
+    end
+
   end
 
   describe "#name" do

@@ -41,6 +41,7 @@ Rivendell::Import.config do |config|
 
       cart.clear_cuts!
       cart.find_by_title name
+      cart.cut.description = file.basename
     end
 
     cart.group ||= "TEST"
@@ -48,6 +49,6 @@ Rivendell::Import.config do |config|
     # To delete file when task is completed
     #task.delete_file!
 
-    notify 'alban@tryphon.eu', :by => :email
+    # notify 'alban@tryphon.eu', :by => :email
   end
 end
