@@ -13,6 +13,14 @@ module Rivendell::Import
       Kernel.load file
     end
 
+    def current_config
+      ::File.read file
+    end
+
+    def save(config)
+      ::File.write absolute_path, config
+    end
+
     def listen_file
       return unless auto_reload?
 

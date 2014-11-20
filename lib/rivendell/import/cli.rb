@@ -97,6 +97,7 @@ module Rivendell::Import
       Rivendell::Import.logger.debug "Start webserver"
 
       Thread.new do
+        Rivendell::Import::Application.set :config_loader, config_loader
         Rivendell::Import::Application.run!
 
         # FIXME we don't see difference between normal quit and start error (EADDRINUSE, ...)
@@ -106,7 +107,7 @@ module Rivendell::Import
     end
 
     def config_loader
-      ConfigLoader.new(config_file, listen_mode?)
+      @config_loader = ConfigLoader.new(config_file, listen_mode?)
     end
 
     def daemonize

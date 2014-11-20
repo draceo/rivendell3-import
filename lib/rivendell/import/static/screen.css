@@ -11,6 +11,9 @@ body {
   font-size: 14px;
   font-family: Trebuchet MS, Verdana, sans-serif;
 }
+html, body {
+  height: 100%;
+}
 a {
   color: #5884a6;
   text-decoration: none;
@@ -62,6 +65,7 @@ em { font-style: italic; }
 #frame {
   width: 750px;
   margin: 0 auto;
+  height: 100%;
 }
 #frame:after {
   content: ".";
@@ -72,6 +76,7 @@ em { font-style: italic; }
 }
 #content {
   padding-top: 5px;
+  height: 100%;
 }
 #content .empty {
   margin-top: 10px;
@@ -140,4 +145,30 @@ em { font-style: italic; }
 }
 #content form {
   margin-bottom: 10px;
+}
+
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+
+  clear: both;
+  margin-top: 25px;
+}
+.CodeMirror-scroll {
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+form.config_edit div {
+    position: relative;
+}
+
+form.config_edit div p {
+    padding-top: 7px;
+}
+
+form.config_edit span.button {
+    position: absolute;
+    right: 0;
+    top: 0;
 }

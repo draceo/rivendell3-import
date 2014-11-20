@@ -24,6 +24,23 @@ module Rivendell::Import
       tasks.to_json
     end
 
+    def config_loader
+      settings.config_loader
+    end
+
+    def edit_config
+      erb :config, :locals => { :config => config_loader.current_config }
+    end
+
+    get '/config' do
+      edit_config
+    end
+
+    post '/config' do
+      config_loader.save params["config"]
+      edit_config
+    end
+
     def tasks
       Task.order("updated_at DESC")
     end
