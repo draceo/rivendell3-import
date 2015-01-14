@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rivendell-import (0.10)
+    rivendell-import (1.01)
       SyslogLogger (~> 2.0)
       activerecord (~> 3.2.8)
       activesupport (~> 3.2.8)
@@ -184,7 +184,7 @@ GEM
     taglib-ruby (0.7.0)
     thor (0.19.1)
     tilt (1.4.1)
-    trollop (2.0)
+    trollop (2.1.1)
     tzinfo (0.3.42)
     uuidtools (2.1.5)
     will_paginate (3.0.7)

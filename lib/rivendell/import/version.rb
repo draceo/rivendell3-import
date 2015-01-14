@@ -1,5 +1,5 @@
 module Rivendell
   module Import
-    VERSION = "0.10"
+    VERSION = "1.01"
   end
 end
