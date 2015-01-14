@@ -167,7 +167,7 @@ module Rivendell::Import
       cut.create
 
       Rivendell::Import.logger.debug "Import #{file.path} in Cut #{cut.number}"
-      xport.import number, cut.number, file.path, import_options
+      xport.import number, cut.number, file.path, import_options.symbolize_keys
       cut.update
     end
 

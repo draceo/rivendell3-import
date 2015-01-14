@@ -5,6 +5,7 @@ require "active_support/core_ext/enumerable"
 require "active_support/core_ext/hash/except"
 require "active_support/core_ext/module/attribute_accessors"
 require "active_support/core_ext/module/delegation"
+require "active_support/hash_with_indifferent_access"
 require 'taglib'
 
 require "rivendell/import/config"
