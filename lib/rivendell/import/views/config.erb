@@ -8,8 +8,11 @@
     });
   }
 
+  saved = false;
   window.onbeforeunload = function() {
-    return true;
+    if (!saved) {
+      return true;
+    }
   }
 </script>
 
@@ -17,7 +20,7 @@
   <div>
     <p>Modify the current import configuration :</p>
     <span class="button">
-      <input type="submit" value="Save"/>
+      <input type="submit" value="Save" onclick="saved = true;" />
       or <a href="/">cancel</a>
     </span>
   </div>
