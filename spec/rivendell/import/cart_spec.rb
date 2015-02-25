@@ -192,7 +192,7 @@ describe Rivendell::Import::Cart do
       subject.scheduler_codes << "dummy"
       subject.attributes["scheduler_codes"].should == ["dummy"]
     end
-    
+
   end
 
   describe "#to_json" do
@@ -218,12 +218,12 @@ describe Rivendell::Import::Cart do
     it "should contain ApiUpdater" do
       subject.updaters.should include(Rivendell::Import::Cart::ApiUpdater)
     end
- 
+
     it "should not contain ApiUpdater if scheduler codes is defined" do
       subject.scheduler_codes << "dummy"
       subject.updaters.should_not include(Rivendell::Import::Cart::ApiUpdater)
     end
-   
+
     it "should contain DbUpdater if Database is enabled" do
       Rivendell::Import::Database.stub :enabled? => true
       subject.updaters.should include(Rivendell::Import::Cart::DbUpdater)
@@ -233,7 +233,7 @@ describe Rivendell::Import::Cart do
       Rivendell::Import::Database.stub :enabled? => false
       subject.updaters.should_not include(Rivendell::Import::Cart::DbUpdater)
     end
-    
+
   end
 
   describe "#update" do
@@ -256,9 +256,9 @@ describe Rivendell::Import::Cart do
       subject.stub :updaters => []
       subject.update.should be_false
     end
-    
+
   end
-  
+
 end
 
 describe Rivendell::Import::Cart::Updater do
@@ -299,7 +299,7 @@ describe Rivendell::Import::Cart::Updater do
       subject.stub :update! => false
       subject.update.should be_false
     end
-    
+
   end
 
   describe "#title_with_default" do
@@ -317,7 +317,7 @@ describe Rivendell::Import::Cart::Updater do
     context "when default title is defined" do
 
       before { cart.default_title = "dummy" }
-      
+
       it "should default title if current title is empty" do
         subject.stub current_title: "[new cart]"
         subject.title_with_default.should == cart.default_title
@@ -329,9 +329,9 @@ describe Rivendell::Import::Cart::Updater do
       end
 
     end
-    
+
   end
-  
+
 end
 
 describe Rivendell::Import::Cart::ApiUpdater do
@@ -353,7 +353,7 @@ describe Rivendell::Import::Cart::ApiUpdater do
       xport.should_receive(:list_cart).with(cart.number).and_return(xport_cart)
       subject.current_title.should == xport_cart.title
     end
-    
+
   end
 
   describe "#attributes" do
@@ -367,7 +367,27 @@ describe Rivendell::Import::Cart::ApiUpdater do
       subject.stub title_with_default: nil
       subject.attributes.should == {}
     end
-    
+
+    it "should contain artist if defined" do
+      cart.artist = "dummy"
+      subject.attributes[:artist].should == subject.artist
+    end
+
+    it "should not contain artist if not defined" do
+      cart.artist = nil
+      subject.attributes.should_not have_key(:artist)
+    end
+
+    it "should contain album if defined" do
+      cart.album = "dummy"
+      subject.attributes[:album].should == subject.album
+    end
+
+    it "should not contain album if not defined" do
+      cart.album = nil
+      subject.attributes.should_not have_key(:album)
+    end
+
   end
 
   describe "#update!" do
@@ -379,7 +399,7 @@ describe Rivendell::Import::Cart::ApiUpdater do
         xport.should_receive(:edit_cart).with(cart.number, subject.attributes)
         subject.update!
       end
-      
+
     end
 
     context "when attributes is empty" do
@@ -389,11 +409,11 @@ describe Rivendell::Import::Cart::ApiUpdater do
         xport.should_not_receive(:edit_cart)
         subject.update!.should be_true
       end
-      
+
     end
-    
+
   end
-  
+
 end
 
 describe Rivendell::Import::Cart::DbUpdater do
@@ -416,7 +436,7 @@ describe Rivendell::Import::Cart::DbUpdater do
       Rivendell::DB::Cart.should_receive(:get).with(cart.number).and_return(db_cart)
       subject.current_cart.should == db_cart
     end
-    
+
   end
 
   describe "#current_title" do
@@ -425,7 +445,7 @@ describe Rivendell::Import::Cart::DbUpdater do
       db_cart.stub title: "dummy"
       subject.current_title.should == db_cart.title
     end
-    
+
   end
 
   describe "#update!" do
@@ -441,12 +461,24 @@ describe Rivendell::Import::Cart::DbUpdater do
       db_cart.title.should == subject.title_with_default
     end
 
+    it "should use artist as Cart artist" do
+      subject.stub artist: "dummy"
+      subject.update!
+      db_cart.artist.should == subject.artist
+    end
+
+    it "should use album as Cart album" do
+      subject.stub album: "dummy"
+      subject.update!
+      db_cart.album.should == subject.album
+    end
+
     it "should define scheduler_codes" do
       subject.stub scheduler_codes: ["dummy"]
       subject.update!
       db_cart.scheduler_codes.should == subject.scheduler_codes
     end
-    
+
   end
-  
+
 end

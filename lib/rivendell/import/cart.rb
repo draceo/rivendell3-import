@@ -10,7 +10,7 @@ module Rivendell::Import
 
     def attributes
       attributes = {}
-      %w{number group clear_cuts title default_title scheduler_codes import_options}.each do |attribute|
+      %w{number group clear_cuts title default_title scheduler_codes artist album import_options}.each do |attribute|
         value = send attribute
         attributes[attribute] = value if value.present?
       end
@@ -32,7 +32,7 @@ module Rivendell::Import
 
     delegate :blank?, :to => :attributes
 
-    attr_accessor :number, :group, :title, :default_title, :scheduler_codes
+    attr_accessor :number, :group, :title, :default_title, :scheduler_codes, :artist, :album
     attr_reader :task
 
     def initialize(task = nil)
@@ -74,7 +74,7 @@ module Rivendell::Import
       def initialize(cart)
         @cart = cart
       end
-      delegate :number, :title, :default_title, :scheduler_codes, :to => :cart
+      delegate :number, :title, :default_title, :scheduler_codes, :artist, :album, :to => :cart
 
       def empty_title?(title)
         [ nil, "", "[new cart]" ].include? title
@@ -120,6 +120,8 @@ module Rivendell::Import
       def attributes
         {}.tap do |attributes|
           attributes[:title] = title_with_default if title_with_default
+          attributes[:artist] = artist if artist
+          attributes[:album] = album if album
         end
       end
 
@@ -138,10 +140,12 @@ module Rivendell::Import
       def update!
         Database.init
 
-        if title_with_default or not scheduler_codes.empty?
+        if title_with_default or artist or album or not scheduler_codes.empty?
           Rivendell::Import.logger.debug "Update Cart by DB"
           current_cart.title = title_with_default if title_with_default
           current_cart.scheduler_codes = scheduler_codes unless scheduler_codes.empty?
+          current_cart.artist = artist if artist
+          current_cart.album = album if album
           current_cart.save
         end
       end
