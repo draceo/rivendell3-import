@@ -259,8 +259,8 @@ describe Rivendell::Import::Task do
   describe "#change_status!" do
 
     it "should update_attribute :status" do
-      subject.should_receive(:update_attribute).with(:status, "completed")
       subject.change_status! :completed
+      subject.status.should == "completed"
     end
 
     it "should notify change when status is completed" do
@@ -351,17 +351,17 @@ describe Rivendell::Import::Task do
   describe ".ran" do
 
     it "should return completed tasks" do
-      subject.change_status! "completed"
+      subject.change_status!("completed").save
       expect(Rivendell::Import::Task.ran).to include(subject)
     end
 
     it "should return failed tasks" do
-      subject.change_status! "failed"
+      subject.change_status!("failed").save
       expect(Rivendell::Import::Task.ran).to include(subject)
     end
 
     it "should return canceled tasks" do
-      subject.change_status! "canceled"
+      subject.change_status!("canceled").save
       expect(Rivendell::Import::Task.ran).to include(subject)
     end
 

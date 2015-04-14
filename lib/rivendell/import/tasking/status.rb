@@ -29,6 +29,8 @@ module Rivendell::Import::Tasking
       end
       # notify! if ran?
       invoke_status_changed_callbacks
+
+      self
     end
 
     def invoke_status_changed_callbacks
