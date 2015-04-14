@@ -63,6 +63,7 @@ module Rivendell::Import
         Context.new(self).run(&block)
       rescue => e
         logger.error "Task preparation failed : #{e}"
+        change_status! :failed
       end
       self
     end
@@ -133,7 +134,7 @@ module Rivendell::Import
       logger.debug e.backtrace.join("\n")
     ensure
       close_file
-      
+
       unless ran?
         change_status! :failed
       end

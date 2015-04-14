@@ -37,3 +37,7 @@ end
 Then /^the task should have tag "([^"]*)"$/ do |tag|
   import.tasks.pop.tags.should include(tag)
 end
+
+Then /^the task should have status "([^"]*)"$/ do |status|
+  Rivendell::Import::Task.last.status.should == status
+end

@@ -22,7 +22,11 @@ module Rivendell::Import::Tasking
 
     def change_status!(status)
       logger.debug "Change status to #{status}"
-      update_attribute :status, status.to_s
+      if persisted?
+        update_attribute :status, status.to_s
+      else
+        self.status = status.to_s
+      end
       # notify! if ran?
       invoke_status_changed_callbacks
     end

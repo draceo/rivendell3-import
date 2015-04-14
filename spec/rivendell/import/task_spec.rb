@@ -63,6 +63,13 @@ describe Rivendell::Import::Task do
       given_file.should == subject.file
     end
 
+    it "should change task status to failed if prepare fails" do
+      subject.prepare do |file|
+        raise "Error"
+      end
+      subject.status.should == "failed"
+    end
+
   end
 
   describe "#run" do
