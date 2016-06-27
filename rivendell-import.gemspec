@@ -20,6 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'httmultiparty'
   # 0.12.0 requires ruby 1.9.3
   gem.add_runtime_dependency 'httparty', '0.11.0'
+  gem.add_runtime_dependency 'mime-types', '~> 2.4.3'
   gem.add_runtime_dependency 'rivendell-api', '~> 0.9'
   gem.add_runtime_dependency 'trollop'
   gem.add_runtime_dependency 'activerecord', '~> 3.2.8'
