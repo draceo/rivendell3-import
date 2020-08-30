@@ -1,5 +1,5 @@
-class CreateNotifiers < ActiveRecord::Migration
-  def self.up
+class CreateNotifiers < ActiveRecord::Migration[6.0]
+  def change
     create_table :notifiers do |t|
       t.string :type
       t.string :key
@@ -8,7 +8,4 @@ class CreateNotifiers < ActiveRecord::Migration
     end
   end
 
-  def self.down
-    drop_table :notifiers
-  end
 end

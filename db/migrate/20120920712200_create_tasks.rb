@@ -1,5 +1,5 @@
-class CreateTasks < ActiveRecord::Migration
-  def self.up
+class CreateTasks < ActiveRecord::Migration[6.0]
+  def change
     create_table :tasks do |t|
       t.string :status
 
@@ -8,6 +8,8 @@ class CreateTasks < ActiveRecord::Migration
       t.string :destination
       t.string :tags
       t.text :cart
+      t.integer :delete_file
+      t.string :xport_options
 
       t.integer :priority
 
@@ -15,7 +17,4 @@ class CreateTasks < ActiveRecord::Migration
     end
   end
 
-  def self.down
-    drop_table :tasks
-  end
 end

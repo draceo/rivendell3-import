@@ -1,5 +1,5 @@
-class CreateNotifications < ActiveRecord::Migration
-  def self.up
+class CreateNotifications < ActiveRecord::Migration[6.0]
+  def change
     create_table :notifications do |t|
       t.belongs_to :task
       t.belongs_to :notifier
@@ -8,7 +8,4 @@ class CreateNotifications < ActiveRecord::Migration
     end
   end
 
-  def self.down
-    drop_table :notifications
-  end
 end
