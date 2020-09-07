@@ -1,6 +1,6 @@
 require 'thread'
 
-module Rivendell::Import
+module Rivendell3::Import
   class Base
 
     attr_reader :tasks, :workers
@@ -21,21 +21,21 @@ module Rivendell::Import
     def listen(directory, options = {})
       workers << Worker.new(self).start unless options[:dry_run]
 
-      Rivendell::Import.logger.info "Listen files in #{directory}"
+      Rivendell3::Import.logger.info "Listen files in #{directory}"
       callback = Proc.new do |modified, added, removed|
         # Rivendell::Import.logger.debug [modified, added, removed].inspect
         added.each do |file|
           begin
-            Rivendell::Import.logger.debug "Detected file '#{file}'"
+            Rivendell3::Import.logger.debug "Detected file '#{file}'"
             file(file, directory)
           rescue Exception => e
-            Rivendell::Import.logger.error "Task creation failed : #{e}"
-            Rivendell::Import.logger.debug e.backtrace.join("\n")
+            Rivendell3::Import.logger.error "Task creation failed : #{e}"
+            Rivendell3::Import.logger.debug e.backtrace.join("\n")
           end
         end
       end
 
-      Listen.to(directory, latency: 1, wait_for_delay: 5).change(&callback).start!
+      Listen.to(directory, latency: 1, wait_for_delay: 5, &callback).start
     end
 
     def process(*paths)
@@ -60,7 +60,7 @@ module Rivendell::Import
       return if ignore? path
 
       path = ::File.expand_path(path, base_directory)
-      file = Rivendell::Import::File.new path, :base_directory => base_directory
+      file = Rivendell3::Import::File.new path, :base_directory => base_directory
       create_task file
     end
 
@@ -71,7 +71,7 @@ module Rivendell::Import
     end
 
     def create_task(file)
-      Rivendell::Import.logger.debug "Create task for #{file}"
+      Rivendell3::Import.logger.debug "Create task for #{file}"
       tasks.create(file) do |task|
         prepare_task task
       end

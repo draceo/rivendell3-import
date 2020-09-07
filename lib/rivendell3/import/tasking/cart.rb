@@ -1,4 +1,4 @@
-module Rivendell::Import::Tasking
+module Rivendell3::Import::Tasking
   module Cart
 
     def raw_cart
@@ -6,7 +6,7 @@ module Rivendell::Import::Tasking
     end
 
     def cart
-      @cast ||= Rivendell::Import::Cart.new(self).tap do |cart|
+      @cast ||= Rivendell3::Import::Cart.new(self).tap do |cart|
         cart.from_json(raw_cart, false) if raw_cart
       end
     end

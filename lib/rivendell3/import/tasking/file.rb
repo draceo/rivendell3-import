@@ -1,4 +1,4 @@
-module Rivendell::Import::Tasking
+module Rivendell3::Import::Tasking
   module File
 
     def file=(file)
@@ -15,7 +15,7 @@ module Rivendell::Import::Tasking
     end
 
     def file
-      @file ||= Rivendell::Import::File.new(file_name, :path => file_path)
+      @file ||= Rivendell3::Import::File.new(file_name, :path => file_path)
     end
 
     def delete_file!

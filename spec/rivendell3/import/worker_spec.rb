@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Worker do
+describe Rivendell3::Import::Worker do
 
-  let(:import) { Rivendell::Import::Base.new }
-  subject { Rivendell::Import::Worker.new import }
+  let(:import) { Rivendell3::Import::Base.new }
+  subject { Rivendell3::Import::Worker.new import }
 
-  let(:file) { Rivendell::Import::File.new "dummy.wav" }
+  let(:file) { Rivendell3::Import::File.new "dummy.wav" }
 
   describe "initialization" do
 
     it "should use the given Import" do
-      Rivendell::Import::Worker.new(import).import.should == import
+      Rivendell3::Import::Worker.new(import).import.should == import
     end
-    
+
   end
 
   it "should run Import tasks in a separated Thread" do

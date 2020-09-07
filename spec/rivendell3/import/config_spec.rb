@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Config do
+describe Rivendell3::Import::Config do
 
-  let(:config) { Rivendell::Import::Config.new }
+  let(:config) { Rivendell3::Import::Config.new }
 
   describe "#to_prepare" do
 
@@ -10,7 +10,7 @@ describe Rivendell::Import::Config do
 
     it "should define Base.default_to_prepare with given block" do
       subject.to_prepare(&user_block)
-      Rivendell::Import::Base.default_to_prepare.should == user_block
+      Rivendell3::Import::Base.default_to_prepare.should == user_block
     end
 
   end
@@ -24,7 +24,7 @@ describe Rivendell::Import::Config do
         attribute = attribute.to_sym
         it "should define Task.default_xport_options[:#{attribute}]" do
           subject.send "#{attribute}=", "dummy"
-          Rivendell::Import::Task.default_xport_options[attribute].should == "dummy"
+          Rivendell3::Import::Task.default_xport_options[attribute].should == "dummy"
         end
       end
     end
@@ -35,11 +35,11 @@ describe Rivendell::Import::Config do
 
     it "should define Database.url" do
       subject.db_url = "dummy"
-      Rivendell::Import::Database.url.should == "dummy"
+      Rivendell3::Import::Database.url.should == "dummy"
     end
 
     after do
-      Rivendell::Import::Database.url = nil
+      Rivendell3::Import::Database.url = nil
     end
 
 

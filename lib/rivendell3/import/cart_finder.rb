@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class CartFinder
 
     def find_all_by_title(string, options = {})
@@ -9,10 +9,12 @@ module Rivendell::Import
         normalizer.call(cart.title) == string
       end
     end
-    
+
     def default_normalizer
       Proc.new do |string|
-        ActiveSupport::Multibyte::Chars.new(string).normalize(:kd).gsub(/[^\x00-\x7F]/n,'').downcase.to_s.gsub(/[^a-z0-9]/," ").gsub(/[ ]+/," ")
+        ActiveSupport::Multibyte::Chars.new(string)
+          .unicode_normalize(:nfkd).gsub(/[^\x00-\x7F]/n,'')
+          .downcase.to_s.gsub(/[^a-z0-9]/," ").gsub(/[ ]+/," ")
       end
     end
 
@@ -35,7 +37,7 @@ module Rivendell::Import
       end
 
       def cache
-        clear if purged_at < time_to_live.ago
+        clear if purged_at < time_to_live.seconds.ago
         @cache ||= {}
       end
 
@@ -45,13 +47,13 @@ module Rivendell::Import
 
       @@time_to_live = 600
       cattr_accessor :time_to_live
-      
+
       attr_accessor :purged_at
-      
+
       def purged_at
         @purged_at ||= Time.now
       end
-      
+
       def carts(options = {})
         cache[options.to_s] ||= xport.list_carts(options)
       end

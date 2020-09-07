@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Base do
+describe Rivendell3::Import::Base do
 
   describe "#prepare_task" do
 
-    let(:task) { mock }
+    let(:task) { double }
 
     it "should prepare task with to_prepare block" do
       subject.to_prepare = Proc.new {}
-      task.should_receive :prepare
+      expect(task).to receive(:prepare)
       subject.prepare_task task
     end
 
@@ -16,26 +16,27 @@ describe Rivendell::Import::Base do
 
   describe "#to_prepare" do
 
-    let(:block) { mock }
+    let(:block) { double }
 
     it "should use default_to_prepare if not defined" do
-      subject.stub :default_to_prepare => block
-      subject.to_prepare.should == block
+      #subject.stub :default_to_prepare => block
+      allow(subject).to receive(:default_to_prepare).and_return(block)
+      expect(subject.to_prepare).to eq(block)
     end
 
   end
 
   describe "#create_task" do
 
-    let(:file) { Rivendell::Import::File.new "dummy.wav" }
+    let(:file) { Rivendell3::Import::File.new "dummy.wav" }
 
     it "should create a task with given file" do
-      Rivendell::Import::Task.should_receive(:create).with({:file => file}, {})
+      expect(Rivendell3::Import::Task).to receive(:create).with({:file => file})
       subject.create_task file
     end
 
     it "should prepare task" do
-      subject.should_receive(:prepare_task)
+      expect(subject).to receive(:prepare_task)
       subject.create_task file
     end
 
@@ -43,15 +44,15 @@ describe Rivendell::Import::Base do
 
   describe "#file" do
 
-    let(:file) { Rivendell::Import::File.new("dummy.wav") }
+    let(:file) { Rivendell3::Import::File.new("dummy.wav") }
 
     it "should create a File with given path and base_directory" do
-      subject.file("path", "base_directory").file_path.should == File.expand_path("path", "base_directory")
+      expect(subject.file("path", "base_directory").file_path).to eq(File.expand_path("path", "base_directory"))
     end
 
     it "should create a File with given path and base_directory" do
-      Rivendell::Import::File.stub :new => file
-      subject.should_receive(:create_task).with(file)
+      allow(Rivendell3::Import::File).to receive(:new).and_return(file)
+      expect(subject).to receive(:create_task).with(file)
       subject.file "path", "base_directory"
     end
 
@@ -66,7 +67,7 @@ describe Rivendell::Import::Base do
         file = "#{directory}/subdirectory/dummy.wav"
         FileUtils.touch file
 
-        subject.should_receive(:file).with(file, directory)
+        expect(subject).to receive(:file).with(file, directory)
         subject.directory directory
       end
     end
@@ -77,13 +78,13 @@ describe Rivendell::Import::Base do
 
     it "should use file method when path isn't a directory" do
       File.stub :directory? => false
-      subject.should_receive(:file).with("dummy")
+      expect(subject).to receive(:file).with("dummy")
       subject.process("dummy")
     end
 
     it "should use directory method when path is a directory" do
       File.stub :directory? => true
-      subject.should_receive(:directory).with("dummy")
+      expect(subject).to receive(:directory).with("dummy")
       subject.process("dummy")
     end
 
@@ -92,21 +93,21 @@ describe Rivendell::Import::Base do
   describe "#listen" do
 
     before(:each) do
-      Listen.stub :to => mock(:change => mock(:start! => true))
+      Listen.stub :to => double("Listener",:start => true)
     end
 
     let(:directory) { "directory" }
-    let(:worker) { mock }
+    let(:worker) { double }
 
     before(:each) do
       worker.stub :start => worker
-      Rivendell::Import::Worker.stub :new => worker
+      Rivendell3::Import::Worker.stub :new => worker
     end
 
     it "should create a Worker" do
-      Rivendell::Import::Worker.should_receive(:new).with(subject).and_return(worker)
+      Rivendell3::Import::Worker.should_receive(:new).with(subject).and_return(worker)
       subject.listen directory
-      subject.workers.should == [ worker ]
+      expect(subject.workers).to eq([ worker ])
     end
 
     it "should start Worker" do
@@ -131,16 +132,16 @@ describe Rivendell::Import::Base do
     context "when default file patterns" do
 
       it "should ignore hidden file" do
-        subject.ignore?("path/to/.nfs00000000074200420000000c").should be_true
-        subject.ignore?(".nfs00000000074200420000000c").should be_true
+        subject.ignore?("path/to/.nfs00000000074200420000000c").should be true
+        subject.ignore?(".nfs00000000074200420000000c").should be true
       end
 
       it "should accept files in directories" do
-        subject.ignore?("path/to/normal_file.mp3").should be_false
+        subject.ignore?("path/to/normal_file.mp3").should be false
       end
 
       it "should accept files in root directory" do
-        subject.ignore?("file").should be_false
+        subject.ignore?("file").should be false
       end
 
     end

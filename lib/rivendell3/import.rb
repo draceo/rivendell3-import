@@ -1,4 +1,4 @@
-require "rivendell/import/version"
+require "rivendell3/import/version"
 
 require "null_logger"
 require "active_support/core_ext/enumerable"
@@ -8,9 +8,24 @@ require "active_support/core_ext/module/delegation"
 require "active_support/hash_with_indifferent_access"
 require 'taglib'
 
-require "rivendell/import/config"
+require "rivendell3/import/config"
 
-module Rivendell
+class Range
+  def to_json(*a)
+    {
+      'json_class'   => self.class.name, # = 'Range'
+      'data'         => [ first, last, exclude_end? ]
+    }.to_json(*a)
+  end
+end
+
+class Range
+  def self.json_create(o)
+    new(*o['data'])
+  end
+end
+
+module Rivendell3
   module Import
 
     @@config = Config.new
@@ -22,18 +37,28 @@ module Rivendell
     @@logger = NullLogger.instance
     mattr_accessor :logger
 
-    def self.establish_connection(file_or_uri = "db.sqlite3")
+    def self.schema_migrations
+      ActiveRecord::SchemaMigration.tap do |sm|
+        sm.create_table
+      end
+    end
+
+    def self.establish_connection(file_or_uri)
+
       database_spec =
-        if URI.parse(file_or_uri).scheme.in? [nil, "file"]
+        if [nil, "file"].include? URI.parse(file_or_uri).scheme
           { :adapter => "sqlite3", :database => file_or_uri }
         else
           file_or_uri
         end
 
       ActiveRecord::Base.establish_connection database_spec
-      ActiveRecord::Migrator.migrate(::File.expand_path("../../../db/migrate/", __FILE__), nil)
+      migration_directory = ::File.expand_path("../../../db/migrate/", __FILE__)
+      migrator = ActiveRecord::MigrationContext.new(migration_directory, schema_migrations)
+      migrator.migrate
     end
 
+    class GroupMissing < ArgumentError; end
   end
 end
 
@@ -42,24 +67,24 @@ require 'listen'
 require 'active_record'
 ActiveRecord::Base.include_root_in_json = false
 
-require "rivendell/api"
+require "rivendell3/api"
 
-require "rivendell/import/config"
-require "rivendell/import/config_loader"
-require "rivendell/import/worker"
-require "rivendell/import/task"
-require "rivendell/import/tasks"
-require "rivendell/import/base"
-require "rivendell/import/database"
-require "rivendell/import/cart_finder"
-require "rivendell/import/cart"
-require "rivendell/import/context"
-require "rivendell/import/cut"
-require "rivendell/import/file"
-require "rivendell/import/notification"
-require "rivendell/import/notifier/base"
-require "rivendell/import/notifier/mail"
+require "rivendell3/import/config"
+require "rivendell3/import/config_loader"
+require "rivendell3/import/worker"
+require "rivendell3/import/task"
+require "rivendell3/import/tasks"
+require "rivendell3/import/base"
+require "rivendell3/import/database"
+require "rivendell3/import/cart_finder"
+require "rivendell3/import/cart"
+require "rivendell3/import/context"
+require "rivendell3/import/cut"
+require "rivendell3/import/file"
+require "rivendell3/import/notification"
+require "rivendell3/import/notifier/base"
+require "rivendell3/import/notifier/mail"
 
-# TODO Rivendell::Import::CartFinder::ByDb should be optional
-require 'rivendell/db'
-require 'rivendell/import/cart_finder_by_db'
+# TODO Rivendell3::Import::CartFinder::ByDb should be optional
+#require 'rivendell3/db'
+#require 'rivendell3/import/cart_finder_by_db'

@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Context
 
     attr_reader :task
@@ -14,7 +14,7 @@ module Rivendell::Import
     end
 
     def notify(target, options = {})
-      Rivendell::Import::Notifier::Base.notify(target, options).tap do |notifier|
+      Rivendell3::Import::Notifier::Base.notify(target, options).tap do |notifier|
         logger.debug "Will notify with #{notifier.inspect}"
         task.notifiers << notifier
       end

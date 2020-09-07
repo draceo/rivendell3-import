@@ -1,8 +1,8 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Notification < ActiveRecord::Base
 
     belongs_to :task
-    belongs_to :notifier, :class_name => "Rivendell::Import::Notifier::Base"
+    belongs_to :notifier, :class_name => "Rivendell3::Import::Notifier::Base"
 
     def sent?
       sent_at.present?

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Rivendell::Import::File do
+describe Rivendell3::Import::File do
 
-  subject { Rivendell::Import::File.new fixture_file("audio.ogg"), :base_directory => fixture_directory }
+  subject { Rivendell3::Import::File.new fixture_file("audio.ogg"), :base_directory => fixture_directory }
 
   after do
     subject.close
@@ -11,7 +11,7 @@ describe Rivendell::Import::File do
   describe "initialization" do
 
     it "should use given base_directory to compute relative name" do
-      Rivendell::Import::File.new("/path/to/dummy.wav", :base_directory => "/path/to").name.should == "dummy.wav"
+      Rivendell3::Import::File.new("/path/to/dummy.wav", :base_directory => "/path/to").name.should == "dummy.wav"
     end
 
   end
@@ -27,7 +27,7 @@ describe Rivendell::Import::File do
   describe ".relative_filename" do
 
     it "should return '/subdirectory/file' from '/base/subdirectory/file'" do
-      Rivendell::Import::File.relative_filename('/base/subdirectory/file', '/base').should == 'subdirectory/file'
+      Rivendell3::Import::File.relative_filename('/base/subdirectory/file', '/base').should == 'subdirectory/file'
     end
 
   end
@@ -84,7 +84,7 @@ describe Rivendell::Import::File do
   describe "#audio_properties" do
 
     it "should file audio properties" do
-      subject.audio_properties.length.should == 60
+      subject.audio_properties.length_in_seconds.should == 60
     end
 
   end
@@ -95,7 +95,7 @@ describe Rivendell::Import::File do
       subject.file_ref.should_receive :close
       subject.close
     end
-    
+
   end
 
 end

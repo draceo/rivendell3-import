@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Tasks do
+describe Rivendell3::Import::Tasks do
 
-  let(:file) { Rivendell::Import::File.new "dummy.wav" }
+  let(:file) { Rivendell3::Import::File.new "dummy.wav" }
 
   describe "#run" do
 

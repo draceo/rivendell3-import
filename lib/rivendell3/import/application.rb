@@ -3,7 +3,7 @@ require 'sinatra'
 require 'will_paginate'
 require 'will_paginate/active_record'
 
-module Rivendell::Import
+module Rivendell3::Import
   class Application < Sinatra::Application
 
     set :public_folder, ::File.expand_path('static', ::File.dirname(__FILE__))

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 require 'spec_helper'
 
-describe Rivendell::Import::CartFinder do
+describe Rivendell3::Import::CartFinder do
 
-  let(:cart) { mock :title => "dummy" }
+  let(:cart) { double("", :title => "dummy") }
   let(:carts) { [ cart ] }
 
-  let(:cart_finder) { Rivendell::Import::CartFinder.new }
+  let(:cart_finder) { Rivendell3::Import::CartFinder.new }
   subject { cart_finder }
 
   describe "#find_all_by_title" do
@@ -83,14 +83,14 @@ describe Rivendell::Import::CartFinder do
 
 end
 
-describe Rivendell::Import::CartFinder::ByApi do
+describe Rivendell3::Import::CartFinder::ByApi do
 
-  let(:cart_finder) { Rivendell::Import::CartFinder::ByApi.new(xport) }
+  let(:cart_finder) { Rivendell3::Import::CartFinder::ByApi.new(xport) }
   subject { cart_finder }
 
-  let(:xport) { mock }
+  let(:xport) { double }
 
-  let(:cart) { mock :title => "dummy" }
+  let(:cart) { double :title => "dummy" }
   let(:carts) { [ cart ] }
 
   describe "#carts" do
@@ -120,30 +120,30 @@ describe Rivendell::Import::CartFinder::ByApi do
 
 end
 
-describe Rivendell::Import::CartFinder::ByDb do
-
-  let(:cart_finder) { Rivendell::Import::CartFinder::ByDb.new }
-  subject { cart_finder }
-
-  let(:cart) { mock :title => "dummy" }
-  let(:carts) { [ cart ] }
-
-  describe "#carts" do
-
-    before do
-      Rivendell::Import::Database.stub :init
-      Rivendell::DB::Cart.stub :all => carts
-    end
-
-    it "should return Carts found in database" do
-      subject.carts.should == carts
-    end
-
-    it "should search in specified group if present" do
-      Rivendell::DB::Cart.should_receive(:all).with(hash_including(:group_name => "dummy")).and_return(carts)
-      subject.carts(:group => "dummy")
-    end
-
-  end
-
-end
+# describe Rivendell3::Import::CartFinder::ByDb do
+#
+#   let(:cart_finder) { Rivendell3::Import::CartFinder::ByDb.new }
+#   subject { cart_finder }
+#
+#   let(:cart) { mock :title => "dummy" }
+#   let(:carts) { [ cart ] }
+#
+#   describe "#carts" do
+#
+#     before do
+#       Rivendell3::Import::Database.stub :init
+#       Rivendell3::DB::Cart.stub :all => carts
+#     end
+#
+#     it "should return Carts found in database" do
+#       subject.carts.should == carts
+#     end
+#
+#     it "should search in specified group if present" do
+#       Rivendell3::DB::Cart.should_receive(:all).with(hash_including(:group_name => "dummy")).and_return(carts)
+#       subject.carts(:group => "dummy")
+#     end
+#
+#   end
+#
+# end

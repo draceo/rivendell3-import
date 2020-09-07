@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Tasks
 
     def pop
@@ -16,14 +16,14 @@ module Rivendell::Import
     def create(file, &block)
       retry_count = 3
       begin
-        Rivendell::Import::Task.create({:file => file}, {}, &block).tap do |task|
-          Rivendell::Import.logger.debug "Created task #{task.inspect}"
+        Rivendell3::Import::Task.create({file: file}, &block).tap do |task|
+          Rivendell3::Import.logger.debug "Created task #{task.inspect}"
         end
       rescue Exception => e
-        Rivendell::Import.logger.error "Can't create Task: #{e}"
+        Rivendell3::Import.logger.error "Can't create Task: #{e}\n#{e.backtrace.inspect}"
         retry_count -= 1
         if retry_count > 0
-          Rivendell::Import.logger.error "Retry in 5s"
+          Rivendell3::Import.logger.error "Retry in 5s"
           sleep 5
           retry
         end

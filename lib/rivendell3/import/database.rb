@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   module Database
 
     mattr_accessor :url
@@ -12,7 +12,7 @@ module Rivendell::Import
       raise "Database not enabled (no config.rivendell.db_url defined)" unless enabled?
 
       unless @@initialized
-        Rivendell::DB.establish_connection(url)
+        Rivendell3::DB.establish_connection(url)
         @@initialized = true
       end
     end

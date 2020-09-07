@@ -1,4 +1,4 @@
-module Rivendell::Import::Tasking
+module Rivendell3::Import::Tasking
   module Tags
 
     def raw_tags
@@ -19,7 +19,7 @@ module Rivendell::Import::Tasking
 
     def self.included(base)
       base.class_eval do
-        before_save :write_tags        
+        before_save :write_tags
       end
     end
 

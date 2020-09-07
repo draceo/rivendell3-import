@@ -1,4 +1,4 @@
-module Rivendell::Import::Tasking
+module Rivendell3::Import::Tasking
   module Status
 
     def define_default_status

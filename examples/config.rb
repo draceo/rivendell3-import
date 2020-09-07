@@ -1,5 +1,5 @@
 #   Mail.defaults do
-#     delivery_method :smtp, { :address              => "smtp.me.com",
+#     delivery_method :smtp, { :address              => "smtp.example.com",
 #                              :port                 => 587,
 #                              :domain               => 'your.host.name',
 #                              :user_name            => '<username>',
@@ -9,19 +9,17 @@
 #   end
 
 Mail.defaults do
-  delivery_method :smtp, { :address => "smtp.free.fr" }
+  delivery_method :smtp, { :address => "smtp.example.com" }
 end
 
-# Rivendell::API::Xport.debug_output $stdout
+# Rivendell3::API::Xport.debug_output $stdout
 
-Rivendell::Import::Notifier::Mail.from = "root@tryphon.eu"
+Rivendell3::Import::Notifier::Mail.from = "rd-notifications@example.com"
 
-Rivendell::Import.config do |config|
+Rivendell3::Import.config do |config|
   config.rivendell.host = "localhost"
   config.rivendell.login_name = "user"
   config.rivendell.password = ""
-
-  config.rivendell.db_url = 'mysql://rduser:letmein@localhost/Rivendell'
 
   config.to_prepare do |file|
     # task.cancel!

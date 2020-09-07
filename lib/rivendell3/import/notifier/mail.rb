@@ -1,8 +1,8 @@
 require 'mail'
 require 'erb'
 
-module Rivendell::Import::Notifier
-  class Mail < Rivendell::Import::Notifier::Base
+module Rivendell3::Import::Notifier
+  class Mail < Rivendell3::Import::Notifier::Base
 
     @@from = nil
     cattr_accessor :from
@@ -38,7 +38,7 @@ module Rivendell::Import::Notifier
 
       attr_reader :tasks
       attr_accessor :from, :to, :subject, :body
-      
+
       def initialize(tasks)
         @tasks = tasks
       end
@@ -71,7 +71,7 @@ module Rivendell::Import::Notifier
       end
 
       def render(template)
-        ERB.new(template, nil, '%<>-').result(binding)
+        ERB.new(template, nil, '%<>').result(binding)
       end
 
       def strip(text)

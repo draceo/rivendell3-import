@@ -1,8 +1,8 @@
-require 'trollop'
+require 'optimist'
 require 'logger'
 require 'syslog/logger'
 
-module Rivendell::Import
+module Rivendell3::Import
   class CLI
 
     attr_reader :arguments
@@ -45,21 +45,21 @@ module Rivendell::Import
     end
 
     def parser
-      @parser ||= Trollop::Parser.new do
+      @parser ||= Optimist::Parser.new do
         opt :config, "Configuration file", :type => String #, :required => true
         opt :listen, "Wait for files in given directory"
         opt :dry_run, "Just create tasks without executing them"
         opt :debug, "Enable debug messages (in stderr)"
         opt :syslog, "Log messages to syslog"
-        opt :database, "The database file used to store tasks", :type => String
+        opt :database, "The database file used to store tasks", :type => String, default: "db.sqlite3"
         opt :daemon, "Run in background"
         opt :pid_dir, "Directory to store pid", :type => String
       end
     end
 
     def options
-      @options ||= Trollop::with_standard_exception_handling(parser) do
-        raise Trollop::HelpNeeded if ARGV.empty? # show help screen
+      @options ||= Optimist::with_standard_exception_handling(parser) do
+        raise Optimist::HelpNeeded if ARGV.empty? # show help screen
         parser.parse arguments
       end
     end
@@ -71,7 +71,7 @@ module Rivendell::Import
     end
 
     def import
-      @import ||= Rivendell::Import::Base.new
+      @import ||= Rivendell3::Import::Base.new
     end
 
     def paths
@@ -88,20 +88,21 @@ module Rivendell::Import
           Logger.new($stderr)
         end
 
-      Rivendell::Import.logger = new_logger if new_logger
+      Rivendell3::Import.logger = new_logger if new_logger
+      Rivendell3::API.logger = new_logger if new_logger
     end
 
     def start_webserver
-      require 'rivendell/import/application'
+      require 'rivendell3/import/application'
 
-      Rivendell::Import.logger.debug "Start webserver"
+      Rivendell3::Import.logger.debug "Start webserver"
 
       Thread.new do
-        Rivendell::Import::Application.set :config_loader, config_loader
-        Rivendell::Import::Application.run!
+        Rivendell3::Import::Application.set :config_loader, config_loader
+        Rivendell3::Import::Application.run!
 
         # FIXME we don't see difference between normal quit and start error (EADDRINUSE, ...)
-        Rivendell::Import.logger.debug "Webserver is stopped"
+        Rivendell3::Import.logger.debug "Webserver is stopped"
         exit 0
       end
     end
@@ -117,14 +118,15 @@ module Rivendell::Import
       end
     end
 
+    def establish_connection(db="db.sqlite3")
+      Rivendell3::Import.establish_connection(db)
+    end
+
     def run
       setup_logger
 
-      if database
-        Rivendell::Import.establish_connection database
-      else
-        Rivendell::Import.establish_connection
-      end
+      Rivendell3::Import.logger.debug "database vaut #{database} | #{options}"
+      establish_connection database
 
       config_loader.load
 
@@ -141,6 +143,7 @@ module Rivendell::Import
         listen_options[:dry_run] = true if dry_run?
 
         import.listen paths.first, listen_options
+        sleep
       else
         import.process paths
         import.tasks.run unless dry_run?

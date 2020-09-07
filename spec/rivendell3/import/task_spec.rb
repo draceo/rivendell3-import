@@ -1,14 +1,15 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Task do
+describe Rivendell3::Import::Task do
 
-  let(:file) { Rivendell::Import::File.new("dummy.wav") }
-  subject { Rivendell::Import::Task.new :file => file }
+  #let(:file) { Rivendell3::Import::File.new("dummy.wav") }
+  let(:file) { Rivendell3::Import::File.new(fixture_file("audio.ogg")) }
+  subject { Rivendell3::Import::Task.new :file => file, created_at: 10.seconds.ago }
 
   describe "#file" do
 
     it "should return a file with specified path" do
-      Rivendell::Import::Task.new(:file => file).file.should == file
+      Rivendell3::Import::Task.new(:file => file).file.should == file
     end
 
   end
@@ -24,7 +25,7 @@ describe Rivendell::Import::Task do
   describe "#xport" do
 
     it "should return a instance of Rivendell::API::Xport" do
-      subject.xport.should be_instance_of(Rivendell::API::Xport)
+      subject.xport.should be_instance_of(Rivendell3::API::Xport)
     end
 
     it "should use xport_options" do
@@ -76,7 +77,7 @@ describe Rivendell::Import::Task do
 
     before(:each) do
       subject.stub :destination => "test"
-      subject.stub :cart => mock(:create => true, :import => true, :update => true, :number => 123, :to_json => '')
+      subject.stub :cart => double("", :create => true, :import => true, :update => true, :number => 123, :to_json => '')
     end
 
     context "when task is canceled" do
@@ -91,7 +92,7 @@ describe Rivendell::Import::Task do
 
       it "keeps its canceled status" do
         subject.run
-        expect(subject.status).to be_canceled
+        expect(subject.status.canceled?).to be_truthy
       end
     end
 
@@ -112,7 +113,7 @@ describe Rivendell::Import::Task do
 
     it "should change the status to completed" do
       subject.run
-      subject.status.should be_completed
+      expect(subject.status.completed?).to be_truthy
     end
 
     it "should close the used file" do
@@ -164,12 +165,12 @@ describe Rivendell::Import::Task do
     it "should store destination" do
       subject.cart.number = 123
       subject.save
-      subject.destination.should == Rivendell::Import::Task.find(subject).destination
+      subject.destination.should == Rivendell3::Import::Task.find(subject.id).destination
     end
 
     def reloaded_task
       subject.save
-      Rivendell::Import::Task.find(subject)
+      Rivendell3::Import::Task.find(subject.id)
     end
 
     it "should store tags separated with commas" do
@@ -198,7 +199,7 @@ describe Rivendell::Import::Task do
 
     it "should be include in pending, completed, failed" do
       pending
-      # subject.should validate_inclusion_of(:status, :in => %w{pending running completed failed canceled})
+      subject.should validate_inclusion_of(:status, :in => %w{pending running completed failed canceled})
     end
 
     it "should be pending by default" do
@@ -225,7 +226,7 @@ describe Rivendell::Import::Task do
       subject.save!
     end
 
-    let(:notifier) { Rivendell::Import::Notifier::Test.create! }
+    let(:notifier) { Rivendell3::Import::Notifier::Test.create! }
 
     it "should create a Notification when a Notifier is added" do
       subject.notifiers << notifier
@@ -242,7 +243,7 @@ describe Rivendell::Import::Task do
       subject.notifiers << notifier
     end
 
-    let(:notifier) { Rivendell::Import::Notifier::Test.create! }
+    let(:notifier) { Rivendell3::Import::Notifier::Test.create! }
 
     it "should notify task with all associated notifiers" do
       subject.notify!
@@ -279,20 +280,26 @@ describe Rivendell::Import::Task do
 
     it "should set flag delete_file" do
       subject.delete_file!
-      subject.delete_file.should be_true
+      expect(subject.delete_file).to be_truthy
     end
 
     context "defined" do
 
       before do
-        subject.stub :cart => mock.as_null_object
+        subject.stub :cart => double("fake cart",:number => 123, :group =>"MUSIC")
       end
 
 
       it "should destroy! file when task is completed" do
-        subject.delete_file!
-        subject.file.should_receive(:destroy!)
-        subject.run
+        allow(subject.cart).to receive(:create)
+        allow(subject.cart).to receive(:import)
+        allow(subject.cart).to receive(:update)
+
+        task = subject
+        task.delete_file!
+        #expect(task).to receive(:delete_file?)
+        expect(task.file).to receive(:destroy!)
+        task.run
       end
 
     end
@@ -311,20 +318,20 @@ describe Rivendell::Import::Task do
   describe ".purge!" do
 
     it "should remove tasks older than 24 hours" do
-      old_task = Rivendell::Import::Task.create! :file => file, :created_at => 25.hours.ago
-      Rivendell::Import::Task.purge!
-      Rivendell::Import::Task.exists?(old_task).should be_false
+      old_task = Rivendell3::Import::Task.create! :file => file, :created_at => 25.hours.ago
+      Rivendell3::Import::Task.purge!
+      Rivendell3::Import::Task.exists?(old_task.id).should be false
     end
 
     it "should keep recent tasks" do
-      task = Rivendell::Import::Task.create! :file => file
-      Rivendell::Import::Task.purge!
-      Rivendell::Import::Task.exists?(task).should be_true
+      task = Rivendell3::Import::Task.create! :file => file
+      Rivendell3::Import::Task.purge!
+      Rivendell3::Import::Task.exists?(task.id).should be true
     end
 
     it "should be invoked each time a new Task is created" do
-      Rivendell::Import::Task.should_receive(:purge!)
-      Rivendell::Import::Task.create! :file => file
+      Rivendell3::Import::Task.should_receive(:purge!)
+      Rivendell3::Import::Task.create! :file => file
     end
 
   end
@@ -352,17 +359,17 @@ describe Rivendell::Import::Task do
 
     it "should return completed tasks" do
       subject.change_status!("completed").save
-      expect(Rivendell::Import::Task.ran).to include(subject)
+      expect(Rivendell3::Import::Task.ran).to include(subject)
     end
 
     it "should return failed tasks" do
       subject.change_status!("failed").save
-      expect(Rivendell::Import::Task.ran).to include(subject)
+      expect(Rivendell3::Import::Task.ran).to include(subject)
     end
 
     it "should return canceled tasks" do
       subject.change_status!("canceled").save
-      expect(Rivendell::Import::Task.ran).to include(subject)
+      expect(Rivendell3::Import::Task.ran).to include(subject)
     end
 
   end
@@ -378,21 +385,23 @@ describe Rivendell::Import::Task do
 
   describe "#ready" do
 
+    let(:file) { Rivendell3::Import::File.new(fixture_file("audio.ogg")) }
     def task(attributes = {})
       attributes = { :file => file }.merge(attributes)
-      Rivendell::Import::Task.create attributes
+      Rivendell3::Import::Task.create attributes
     end
 
     it "should return Task order by priority" do
-      lower_priority_task = task priority: 1, created_at: 5.minutes.ago
-      higher_priority_task = task priority: 2
-      Rivendell::Import::Task.ready.should == [ higher_priority_task, lower_priority_task ]
+      lower_priority_task = task priority: 1, created_at: 25.seconds.ago
+      higher_priority_task = task priority: 2, created_at: 15.seconds.ago
+      res = Rivendell3::Import::Task.ready
+      expect(res).to eq([ higher_priority_task, lower_priority_task ])
     end
 
     it "should return Task order by creation date" do
-      new_task = task
-      old_task = task created_at: 5.minutes.ago
-      Rivendell::Import::Task.ready.should == [ old_task, new_task ]
+      new_task = task created_at: 15.seconds.ago
+      old_task = task created_at: 25.seconds.ago
+      expect(Rivendell3::Import::Task.ready).to eq([ old_task, new_task ])
     end
 
   end

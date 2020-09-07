@@ -1,5 +1,5 @@
-module Rivendell::Import::Notifier
-  class Test < Rivendell::Import::Notifier::Base
+module Rivendell3::Import::Notifier
+  class Test < Rivendell3::Import::Notifier::Base
 
     attr_reader :notified_tasks
 

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Context do
+describe Rivendell3::Import::Context do
 
-  let(:file) { Rivendell::Import::File.new "dummy.wav" }
-  let(:task) { Rivendell::Import::Task.new :file => file }
+  let(:file) { Rivendell3::Import::File.new "dummy.wav" }
+  let(:task) { Rivendell3::Import::Task.new :file => file }
 
-  subject { Rivendell::Import::Context.new task }
+  subject { Rivendell3::Import::Context.new task }
 
   describe "#notify" do
 

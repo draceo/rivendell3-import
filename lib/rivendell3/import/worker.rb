@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Worker
 
     attr_reader :import
@@ -9,7 +9,7 @@ module Rivendell::Import
 
     def start
       Thread.new do
-        Rivendell::Import.logger.debug "Start Worker"
+        Rivendell3::Import.logger.debug "Start Worker"
         run
       end
 
@@ -27,7 +27,7 @@ module Rivendell::Import
             sleep 10
           end
         rescue Exception => e
-          Rivendell::Import.logger.error "Worker failed : #{e}"
+          Rivendell3::Import.logger.error "Worker failed : #{e}"
           sleep 10
         end
       end

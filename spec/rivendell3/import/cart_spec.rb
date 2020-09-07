@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Rivendell::Import::Cart do
+describe Rivendell3::Import::Cart do
 
-  let(:task) { mock }
-  subject { Rivendell::Import::Cart.new task }
+  let(:task) { double }
+  subject { Rivendell3::Import::Cart.new task }
 
   describe "initialization" do
 
     it "should use the given task" do
-      Rivendell::Import::Cart.new(task).task.should == task
+      Rivendell3::Import::Cart.new(task).task.should == task
     end
 
   end
@@ -16,7 +16,7 @@ describe Rivendell::Import::Cart do
   describe "#xport" do
 
     before(:each) do
-      task.stub :xport => mock
+      task.stub :xport => double
     end
 
     it "should be task xport" do
@@ -28,17 +28,17 @@ describe Rivendell::Import::Cart do
   describe "#create" do
 
     before(:each) do
-      subject.stub :xport => mock
+      subject.stub :xport => double
     end
 
     it "should use Xport#add_cart with Cart group" do
       subject.group = "dummy"
-      subject.xport.should_receive(:add_cart).with(:group => subject.group).and_return(mock(:number => 123))
+      subject.xport.should_receive(:add_cart).with(:group => subject.group).and_return(double("",:number => 123))
       subject.create
     end
 
     it "should use the number returned by Xport#add_cart" do
-      subject.xport.stub(:add_cart).and_return(mock(:number => 123))
+      subject.xport.stub(:add_cart).and_return(double("",:number => 123))
       subject.group = "dummy"
       subject.create
       subject.number.should == 123
@@ -51,7 +51,7 @@ describe Rivendell::Import::Cart do
       end
 
       it "should not invoke Xport#add_cart" do
-        subject.xport.stub(:add_cart).and_return(mock(:number => 123))
+        subject.xport.stub(:add_cart).and_return(double("",:number => 123))
         subject.create
         subject.number.should == 666
       end
@@ -62,7 +62,7 @@ describe Rivendell::Import::Cart do
 
       it "should raise an error" do
         subject.group = nil
-        lambda { subject.create }.should raise_error
+        lambda { subject.create }.should raise_error(Rivendell3::Import::GroupMissing)
       end
 
     end
@@ -79,11 +79,18 @@ describe Rivendell::Import::Cart do
 
   describe "#import" do
 
-    let(:file) { mock :path => "dummy", :exists? => true }
+    let(:file) { double("file", :path => "dummy_import", :exists? => true) }
 
     before(:each) do
       subject.number = 123
-      subject.stub :cut => mock.as_null_object, :xport => mock.as_null_object
+      #subject.stub :cut => mock.as_null_object, :xport => mock.as_null_object
+      #allow(subject).to receive(:cut)
+      allow(subject).to receive(:xport)
+        .and_return(double("Xport", import: nil, edit_cut: nil, add_cut: nil))
+      allow(subject).to receive(:cut)
+        .and_return(double("Cut", import: nil, edit_cut: nil, number: 1, update: nil, create: nil))
+
+      #subject.stub :cut => double("cut", :create), :xport => double("xport")
     end
 
     it "should create Cut" do
@@ -130,7 +137,7 @@ describe Rivendell::Import::Cart do
 
   describe "#find_by_title" do
 
-    let(:cart) { mock :title => "The Title of the Cart", :number => 123 }
+    let(:cart) { double("mock_cart", :title => "The Title of the Cart", :number => 123) }
 
     before(:each) do
       subject.stub_chain("xport.list_carts").and_return([cart])
@@ -153,7 +160,7 @@ describe Rivendell::Import::Cart do
 
     it "should add the import option :use_metadata => false" do
       subject.find_by_title(cart.title)
-      subject.import_options[:use_metadata].should be_false
+      subject.import_options[:use_metadata].should be false
     end
 
   end
@@ -166,7 +173,7 @@ describe Rivendell::Import::Cart do
 
     it "should set flag clear_cuts" do
       subject.clear_cuts!
-      subject.clear_cuts.should be_true
+      subject.clear_cuts.should be true
     end
 
   end
@@ -184,8 +191,8 @@ describe Rivendell::Import::Cart do
     end
 
     it "should include cut attributes" do
-      subject.cut.days = %{mon}
-      subject.attributes["cut"].should == { "days" => %{mon} }
+      subject.cut.days = %w{mon}
+      subject.attributes["cut"].should == { "days" => %w{mon} }
     end
 
     it "should include scheduler codes" do
@@ -198,8 +205,15 @@ describe Rivendell::Import::Cart do
   describe "#to_json" do
 
     it "should not include root" do
-      subject.cut.days = %{mon}
-      subject.to_json.should == '{"cut":{"days":"mon"}}'
+      subject.cut.days = %w{mon}
+      subject.to_json.should == '{"cut":{"days":["mon"]}}'
+    end
+
+    it "should display start_datetime and end_datetime in the right format" do
+      start_d = DateTime.now
+      end_d = start_d + 3.days
+      subject.cut.datetime = start_d..end_d
+      subject.cut.to_json.should == "{\"start_datetime\":\"#{start_d.strftime("%Y-%m-%dT%H:%M:%S%:z")}\",\"end_datetime\":\"#{end_d.strftime("%Y-%m-%dT%H:%M:%S%:z")}\"}"
     end
 
   end
@@ -216,69 +230,71 @@ describe Rivendell::Import::Cart do
   describe "#updaters" do
 
     it "should contain ApiUpdater" do
-      subject.updaters.should include(Rivendell::Import::Cart::ApiUpdater)
+      subject.updaters.should include(Rivendell3::Import::Cart::ApiUpdater)
     end
 
-    it "should not contain ApiUpdater if scheduler codes is defined" do
-      subject.scheduler_codes << "dummy"
-      subject.updaters.should_not include(Rivendell::Import::Cart::ApiUpdater)
-    end
+    ### Disabled because API can now handle scheduler code
+    # it "should not contain ApiUpdater if scheduler codes is defined" do
+    #   subject.scheduler_codes << "dummy"
+    #   subject.updaters.should_not include(Rivendell3::Import::Cart::ApiUpdater)
+    # end
 
-    it "should contain DbUpdater if Database is enabled" do
-      Rivendell::Import::Database.stub :enabled? => true
-      subject.updaters.should include(Rivendell::Import::Cart::DbUpdater)
-    end
-
-    it "should not contain DbUpdater if Database isn't enabled" do
-      Rivendell::Import::Database.stub :enabled? => false
-      subject.updaters.should_not include(Rivendell::Import::Cart::DbUpdater)
-    end
+    ### DISABLED since DBUpdater should be removed
+    # it "should contain DbUpdater if Database is enabled" do
+    #   Rivendell3::Import::Database.stub :enabled? => true
+    #   subject.updaters.should include(Rivendell3::Import::Cart::DbUpdater)
+    # end
+    #
+    # it "should not contain DbUpdater if Database isn't enabled" do
+    #   Rivendell3::Import::Database.stub :enabled? => false
+    #   subject.updaters.should_not include(Rivendell3::Import::Cart::DbUpdater)
+    # end
 
   end
 
   describe "#update" do
 
     def updater(success = true)
-      double(:new => mock(:update => success))
+      double(:new => double("",:update => success))
     end
 
     it "should return true if an Updater is successful" do
       subject.stub :updaters => [updater(false), updater(true)]
-      subject.update.should be_true
+      subject.update.should be true
     end
 
     it "should return true if all Updaters are not successful" do
       subject.stub :updaters => [updater(false)]
-      subject.update.should be_false
+      subject.update.should be false
     end
 
     it "should return false when no Updater is available" do
       subject.stub :updaters => []
-      subject.update.should be_false
+      subject.update.should be false
     end
 
   end
 
 end
 
-describe Rivendell::Import::Cart::Updater do
+describe Rivendell3::Import::Cart::Updater do
 
-  let(:task) { mock }
-  let(:cart) { Rivendell::Import::Cart.new task }
-  subject { Rivendell::Import::Cart::Updater.new cart }
+  let(:task) { double }
+  let(:cart) { Rivendell3::Import::Cart.new task }
+  subject { Rivendell3::Import::Cart::Updater.new cart }
 
   describe "#empty_title?" do
 
     it "should true when title is nil" do
-      subject.empty_title?(nil).should be_true
+      subject.empty_title?(nil).should be true
     end
 
     it "should true when title is '[new cart]'" do
-      subject.empty_title?('[new cart]').should be_true
+      subject.empty_title?('[new cart]').should be true
     end
 
     it "should false when title is anything else" do
-      subject.empty_title?('dummy').should be_false
+      subject.empty_title?('dummy').should be false
     end
 
   end
@@ -287,17 +303,17 @@ describe Rivendell::Import::Cart::Updater do
 
     it "should return false if update! raises an error" do
       subject.stub(:update!).and_raise("fail")
-      subject.update.should be_false
+      subject.update.should be false
     end
 
     it "should return true if update! returns true" do
       subject.stub :update! => true
-      subject.update.should be_true
+      subject.update.should be true
     end
 
     it "should return false if update! returns false" do
       subject.stub :update! => false
-      subject.update.should be_false
+      subject.update.should be false
     end
 
   end
@@ -334,13 +350,13 @@ describe Rivendell::Import::Cart::Updater do
 
 end
 
-describe Rivendell::Import::Cart::ApiUpdater do
+describe Rivendell3::Import::Cart::ApiUpdater do
 
-  let(:task) { mock }
-  let(:cart) { Rivendell::Import::Cart.new task }
-  subject { Rivendell::Import::Cart::ApiUpdater.new cart }
+  let(:task) { double }
+  let(:cart) { Rivendell3::Import::Cart.new task }
+  subject { Rivendell3::Import::Cart::ApiUpdater.new cart }
 
-  let(:xport) { mock }
+  let(:xport) { double }
 
   before do
     subject.stub xport: xport
@@ -349,7 +365,7 @@ describe Rivendell::Import::Cart::ApiUpdater do
   describe "#current_title" do
 
     it "should retrive the current title via the API" do
-      xport_cart = mock(title: "dummy")
+      xport_cart = double("",title: "dummy")
       xport.should_receive(:list_cart).with(cart.number).and_return(xport_cart)
       subject.current_title.should == xport_cart.title
     end
@@ -407,7 +423,7 @@ describe Rivendell::Import::Cart::ApiUpdater do
       it "should not invoke xport edit_cart" do
         subject.stub attributes: {}
         xport.should_not_receive(:edit_cart)
-        subject.update!.should be_true
+        subject.update!.should be true
       end
 
     end
@@ -416,69 +432,69 @@ describe Rivendell::Import::Cart::ApiUpdater do
 
 end
 
-describe Rivendell::Import::Cart::DbUpdater do
-
-  let(:task) { mock }
-  let(:cart) { Rivendell::Import::Cart.new task }
-  subject { Rivendell::Import::Cart::DbUpdater.new cart }
-
-  let(:db_cart) { Rivendell::DB::Cart.new }
-
-  before do
-    Rivendell::Import::Database.stub init: true
-    db_cart.stub save: true
-    Rivendell::DB::Cart.stub get: db_cart
-  end
-
-  describe "#current_cart" do
-
-    it "should get cart with its number" do
-      Rivendell::DB::Cart.should_receive(:get).with(cart.number).and_return(db_cart)
-      subject.current_cart.should == db_cart
-    end
-
-  end
-
-  describe "#current_title" do
-
-    it "should return current_cart title" do
-      db_cart.stub title: "dummy"
-      subject.current_title.should == db_cart.title
-    end
-
-  end
-
-  describe "#update!" do
-
-    it "should init database" do
-      Rivendell::Import::Database.should_receive :init
-      subject.update!
-    end
-
-    it "should use title_with_default as Cart title" do
-      subject.stub title_with_default: "dummy"
-      subject.update!
-      db_cart.title.should == subject.title_with_default
-    end
-
-    it "should use artist as Cart artist" do
-      subject.stub artist: "dummy"
-      subject.update!
-      db_cart.artist.should == subject.artist
-    end
-
-    it "should use album as Cart album" do
-      subject.stub album: "dummy"
-      subject.update!
-      db_cart.album.should == subject.album
-    end
-
-    it "should define scheduler_codes" do
-      subject.stub scheduler_codes: ["dummy"]
-      subject.update!
-      db_cart.scheduler_codes.should == subject.scheduler_codes
-    end
-
-  end
-
-end
+# describe Rivendell3::Import::Cart::DbUpdater do
+#
+#   let(:task) { mock }
+#   let(:cart) { Rivendell3::Import::Cart.new task }
+#   subject { Rivendell3::Import::Cart::DbUpdater.new cart }
+#
+#   let(:db_cart) { Rivendell3::DB::Cart.new }
+#
+#   before do
+#     Rivendell3::Import::Database.stub init: true
+#     db_cart.stub save: true
+#     Rivendell3::DB::Cart.stub get: db_cart
+#   end
+#
+#   describe "#current_cart" do
+#
+#     it "should get cart with its number" do
+#       Rivendell3::DB::Cart.should_receive(:get).with(cart.number).and_return(db_cart)
+#       subject.current_cart.should == db_cart
+#     end
+#
+#   end
+#
+#   describe "#current_title" do
+#
+#     it "should return current_cart title" do
+#       db_cart.stub title: "dummy"
+#       subject.current_title.should == db_cart.title
+#     end
+#
+#   end
+#
+#   describe "#update!" do
+#
+#     it "should init database" do
+#       Rivendell3::Import::Database.should_receive :init
+#       subject.update!
+#     end
+#
+#     it "should use title_with_default as Cart title" do
+#       subject.stub title_with_default: "dummy"
+#       subject.update!
+#       db_cart.title.should == subject.title_with_default
+#     end
+#
+#     it "should use artist as Cart artist" do
+#       subject.stub artist: "dummy"
+#       subject.update!
+#       db_cart.artist.should == subject.artist
+#     end
+#
+#     it "should use album as Cart album" do
+#       subject.stub album: "dummy"
+#       subject.update!
+#       db_cart.album.should == subject.album
+#     end
+#
+#     it "should define scheduler_codes" do
+#       subject.stub scheduler_codes: ["dummy"]
+#       subject.update!
+#       db_cart.scheduler_codes.should == subject.scheduler_codes
+#     end
+#
+#   end
+#
+# end

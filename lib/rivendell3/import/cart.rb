@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Cart
 
     include ActiveModel::Serialization
@@ -49,7 +49,7 @@ module Rivendell::Import
 
     def create
       unless number
-        raise "Can't create Cart, Group isn't defined" unless group.present?
+        raise GroupMissing, "Can't create Cart, Group isn't defined" unless group.present?
         self.number = xport.add_cart(:group => group).number
       end
     end
@@ -62,8 +62,7 @@ module Rivendell::Import
 
     def updaters
       [].tap do |updaters|
-        updaters << ApiUpdater if scheduler_codes.empty?
-        updaters << DbUpdater if Database.enabled?
+        updaters << ApiUpdater
       end
     end
 
@@ -93,7 +92,7 @@ module Rivendell::Import
         begin
           update!
         rescue => e
-          Rivendell::Import.logger.debug "#{self.class.name} failed : #{e}"
+          Rivendell3::Import.logger.debug "#{self.class.name} failed : #{e}"
           false
         end
       end
@@ -104,7 +103,7 @@ module Rivendell::Import
 
       def update!
         unless attributes.empty?
-          Rivendell::Import.logger.debug "Update Cart by API : #{attributes}"
+          Rivendell3::Import.logger.debug "Update Cart by API : #{attributes}"
           xport.edit_cart number, attributes
         else
           true
@@ -122,31 +121,7 @@ module Rivendell::Import
           attributes[:title] = title_with_default if title_with_default
           attributes[:artist] = artist if artist
           attributes[:album] = album if album
-        end
-      end
-
-    end
-
-    class DbUpdater < Updater
-
-      def current_cart
-        @current_cart ||= Rivendell::DB::Cart.get(number)
-      end
-
-      def current_title
-        current_cart.title
-      end
-
-      def update!
-        Database.init
-
-        if title_with_default or artist or album or not scheduler_codes.empty?
-          Rivendell::Import.logger.debug "Update Cart by DB"
-          current_cart.title = title_with_default if title_with_default
-          current_cart.scheduler_codes = scheduler_codes unless scheduler_codes.empty?
-          current_cart.artist = artist if artist
-          current_cart.album = album if album
-          current_cart.save
+          attributes[:scheduler_codes] = scheduler_codes unless scheduler_codes.empty?
         end
       end
 
@@ -165,20 +140,20 @@ module Rivendell::Import
       raise "File #{file.path} not found" unless file.exists?
 
       if clear_cuts?
-        Rivendell::Import.logger.debug "Clear cuts of Cart #{number}"
+        Rivendell3::Import.logger.debug "Clear cuts of Cart #{number}"
         xport.clear_cuts number
       end
       cut.create
 
-      Rivendell::Import.logger.debug "Import #{file.path} in Cut #{cut.number}"
+      Rivendell3::Import.logger.debug "Import #{file.path} in Cut #{cut.number}"
       xport.import number, cut.number, file.path, import_options.symbolize_keys
       cut.update
     end
 
     def find_by_title(string, options = {})
-      Rivendell::Import.logger.debug "Looking for a Cart '#{string}'"
+      Rivendell3::Import.logger.debug "Looking for a Cart '#{string}'"
       if remote_cart = cart_finder.find_by_title(string, options)
-        Rivendell::Import.logger.debug "Found Cart #{remote_cart.number}"
+        Rivendell3::Import.logger.debug "Found Cart #{remote_cart.number}"
         self.number = remote_cart.number
         self.import_options[:use_metadata] = false
       end
@@ -192,12 +167,7 @@ module Rivendell::Import
     end
 
     def cart_finder
-      @cart_finder ||=
-        unless Database.enabled?
-          Rivendell::Import::CartFinder::ByApi.new xport
-        else
-          Rivendell::Import::CartFinder::ByDb.new
-        end
+      @cart_finder ||= Rivendell3::Import::CartFinder::ByApi.new xport
     end
 
   end

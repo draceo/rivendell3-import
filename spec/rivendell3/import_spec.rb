@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Rivendell::Import do
+describe Rivendell3::Import do
 
   describe ".config" do
 
     context "without argument" do
 
-      it "should return Rivendell::Import::Config instance" do
-        Rivendell::Import.config.should be_instance_of(Rivendell::Import::Config)
+      it "should return Rivendell3::Import::Config instance" do
+        Rivendell3::Import.config.should be_instance_of(Rivendell3::Import::Config)
       end
 
     end
@@ -15,13 +15,13 @@ describe Rivendell::Import do
     context "with a block" do
 
       it "should yield block with Config instance" do
-        config_instance = Rivendell::Import.config
-        Rivendell::Import.should_receive(:config).and_yield(config_instance)
-        Rivendell::Import.config { |config| }
+        config_instance = Rivendell3::Import.config
+        Rivendell3::Import.should_receive(:config).and_yield(config_instance)
+        Rivendell3::Import.config { |config| }
       end
 
       it "should return Config instance" do
-        Rivendell::Import.config { |config| }.should == Rivendell::Import.config
+        Rivendell3::Import.config { |config| }.should == Rivendell3::Import.config
       end
 
     end
@@ -41,7 +41,7 @@ describe Rivendell::Import do
 
       it "should initialize a sqlite database" do
         ActiveRecord::Base.should_receive(:establish_connection).with({ :adapter => "sqlite3", :database => file })
-        Rivendell::Import.establish_connection file
+        Rivendell3::Import.establish_connection file
       end
 
     end
@@ -52,14 +52,17 @@ describe Rivendell::Import do
 
       it "should initialize database with given url" do
         ActiveRecord::Base.should_receive(:establish_connection).with(url)
-        Rivendell::Import.establish_connection url
+        Rivendell3::Import.establish_connection url
       end
 
     end
 
     it "should migrate database" do
-      ActiveRecord::Migrator.should_receive(:migrate).with(File.expand_path("../../../db/migrate/", __FILE__), nil)
-      Rivendell::Import.establish_connection
+      migrator = double("migrator")
+      allow(migrator).to receive(:migrate)
+      expect(ActiveRecord::Migrator).to receive(:new).with(:up, anything, anything, nil).and_return(migrator)
+      expect(migrator).to receive(:migrate)
+      Rivendell3::Import.establish_connection '/srv/rivendell/tmp/db.sqlite3'
     end
 
   end

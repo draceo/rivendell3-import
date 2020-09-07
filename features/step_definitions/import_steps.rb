@@ -1,5 +1,5 @@
 def import
-  @import ||= Rivendell::Import::Base.new.tap do |import|
+  @import ||= Rivendell3::Import::Base.new.tap do |import|
 
   end
 end
@@ -17,8 +17,8 @@ Given /^a cart "(.*?)" exists with (.*)$/ do |number, fields|
     [name, value]
   end.as_hash
 
-  cart = Rivendell::API::Cart.new(attributes.merge(:number => number))
-  Rivendell::Import::Task.mock_xport.carts << cart
+  cart = Rivendell3::API::Cart.new(attributes.merge(:number => number))
+  Rivendell3::Import::Task.mock_xport.carts << cart
 end
 
 Given /^a configuration with this prepare block$/ do |code|
@@ -39,5 +39,5 @@ Then /^the task should have tag "([^"]*)"$/ do |tag|
 end
 
 Then /^the task should have status "([^"]*)"$/ do |status|
-  Rivendell::Import::Task.last.status.should == status
+  Rivendell3::Import::Task.last.status.should == status
 end

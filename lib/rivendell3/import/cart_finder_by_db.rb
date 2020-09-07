@@ -1,7 +1,7 @@
 # Find Carts using a direct database access.
 #
 # Provided to workaround actual accent problems experienced with Rivendell API.
-module Rivendell::Import
+module Rivendell3::Import
   class CartFinder::ByDb < CartFinder
 
     def carts(options = {})
@@ -13,7 +13,7 @@ module Rivendell::Import
         query_options[:group_name] = options[:group]
       end
 
-      Rivendell::DB::Cart.all(query_options)
+      Rivendell3::DB::Cart.all(query_options)
     end
 
   end

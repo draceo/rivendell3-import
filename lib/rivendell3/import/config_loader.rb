@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class ConfigLoader
 
     attr_accessor :file, :auto_reload
@@ -25,27 +25,28 @@ module Rivendell::Import
       return unless auto_reload?
 
       callback = Proc.new do |modified, added, removed|
-        Rivendell::Import.logger.debug "Configuration changed ? #{[modified, added, removed].inspect}"
+        Rivendell3::Import.logger.debug "Configuration changed ? #{[modified, added, removed].inspect}"
         if modified.include? absolute_path
-          Rivendell::Import.logger.info "Configuration changed, reload it"
+          Rivendell3::Import.logger.info "Configuration changed, reload it"
           load
         end
       end
 
-      Rivendell::Import.logger.info "Listen to config file changes (#{file})"
-      Listen.to(directory).filter(/^#{basename}$/).change(&callback).start
+      Rivendell3::Import.logger.info "Listen to config file changes (#{file})"
+#      Listen.to(directory).filter(/^#{basename}$/).change(&callback).start
+      Listen.to(directory, &callback).start
     end
 
     def listen_file_with_inotify
       require 'rb-inotify'
 
       notifier = INotify::Notifier.new.watch(file, :modify) do
-        Rivendell::Import.logger.info "Configuration changed, reload it"
+        Rivendell3::Import.logger.info "Configuration changed, reload it"
         load
       end
 
       Thread.new do
-        Rivendell::Import.logger.info "Listen to config modification (#{file})"
+        Rivendell3::Import.logger.info "Listen to config modification (#{file})"
         notifier.run
       end
     end

@@ -1,16 +1,16 @@
-require 'rivendell/import/tasking/file'
-require 'rivendell/import/tasking/tags'
-require 'rivendell/import/tasking/cart'
-require 'rivendell/import/tasking/status'
-require 'rivendell/import/tasking/destination'
+require 'rivendell3/import/tasking/file'
+require 'rivendell3/import/tasking/tags'
+require 'rivendell3/import/tasking/cart'
+require 'rivendell3/import/tasking/status'
+require 'rivendell3/import/tasking/destination'
 
-module Rivendell::Import
+module Rivendell3::Import
   class Task < ActiveRecord::Base
-    include Rivendell::Import::Tasking::File
-    include Rivendell::Import::Tasking::Tags
-    include Rivendell::Import::Tasking::Cart
-    include Rivendell::Import::Tasking::Status
-    include Rivendell::Import::Tasking::Destination
+    include Rivendell3::Import::Tasking::File
+    include Rivendell3::Import::Tasking::Tags
+    include Rivendell3::Import::Tasking::Cart
+    include Rivendell3::Import::Tasking::Status
+    include Rivendell3::Import::Tasking::Destination
 
     def self.pending
       where :status => "pending"
@@ -35,7 +35,7 @@ module Rivendell::Import
     end
 
     def ran?
-      status.in? RAN_STATUSES
+      RAN_STATUSES.include? status
     end
 
     @@default_xport_options = {}
@@ -55,7 +55,7 @@ module Rivendell::Import
     before_save :write_xport_options
 
     def xport
-      @xport ||= Rivendell::API::Xport.new(xport_options)
+      @xport ||= Rivendell3::API::Xport.new(xport_options)
     end
 
     def prepare(&block)
@@ -69,7 +69,7 @@ module Rivendell::Import
     end
 
     def logger
-      Rivendell::Import.logger
+      Rivendell3::Import.logger
     end
 
     def to_s

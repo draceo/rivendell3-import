@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class File
 
     attr_reader :name, :path
@@ -48,7 +48,7 @@ module Rivendell::Import
     def match(expression)
       name.match(expression).tap do |result|
         verb = result ? "match" : "doesn't match"
-        Rivendell::Import.logger.debug "File #{verb} '#{expression}'"
+        Rivendell3::Import.logger.debug "File #{verb} '#{expression}'"
         !!result
       end
     end
@@ -76,7 +76,7 @@ module Rivendell::Import
     end
 
     def file_ref
-      @file_ref ||= 
+      @file_ref ||=
         if exists? and not (file_ref = TagLib::FileRef.new(path)).null?
           file_ref
         else
@@ -100,9 +100,9 @@ module Rivendell::Import
     def audio_properties
       file_ref.audio_properties if file_ref
     end
-    
+
     def destroy!
-      Rivendell::Import.logger.debug "Delete file #{path}"
+      Rivendell3::Import.logger.debug "Delete file #{path}"
       ::File.delete(path) if exists?
     end
 

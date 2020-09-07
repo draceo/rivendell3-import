@@ -1,7 +1,7 @@
 require 'mail'
 require 'erb'
 
-module Rivendell::Import::Notifier
+module Rivendell3::Import::Notifier
   class Base < ActiveRecord::Base
 
     # self.abstract_class = true
@@ -41,13 +41,13 @@ module Rivendell::Import::Notifier
     end
 
     def logger
-      Rivendell::Import.logger
+      Rivendell3::Import.logger
     end
 
     def parameters=(parameters)
       parameters.each { |k,v| send "#{k}=", v }
     end
-    
+
     def raw_parameters
       read_attribute :parameters
     end
@@ -89,6 +89,6 @@ module Rivendell::Import::Notifier
         new_notifier
       end
     end
-    
+
   end
 end

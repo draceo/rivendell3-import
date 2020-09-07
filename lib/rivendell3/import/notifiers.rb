@@ -1,4 +1,4 @@
-module Rivendell::Import
+module Rivendell3::Import
   class Notifiers
 
     attr_reader :import, :notifiers
