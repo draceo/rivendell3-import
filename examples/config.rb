@@ -47,6 +47,6 @@ Rivendell3::Import.config do |config|
     # To delete file when task is completed
     #task.delete_file!
 
-    # notify 'alban@tryphon.eu', :by => :email
+    # notify 'prog@example-radio.com', :by => :email
   end
 end

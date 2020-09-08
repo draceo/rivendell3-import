@@ -4,8 +4,8 @@ describe Rivendell3::Import::Notifier::Mail do
 
   let(:mail_notifier) do
     Rivendell3::Import::Notifier::Mail.new.tap do |notifier|
-      notifier.from = "root@tryphon.eu"
-      notifier.to = "root@tryphon.eu"
+      notifier.from = "root@example.com"
+      notifier.to = "root@example.com"
     end
   end
 
